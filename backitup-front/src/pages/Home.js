@@ -6,6 +6,8 @@ import Search from "../components/Search"
 import rocket from "../images/rocket.png"
 import Loader from '../components/Loader'
 
+import { createClient } from '@supabase/supabase-js'
+
 export default function Home({ setPageTitle, setUserType, isAuth }) {
 
 
