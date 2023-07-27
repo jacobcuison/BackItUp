@@ -23,10 +23,28 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
 
   // Get list of posts from database
   const loadPosts = async () => {
-    const result1 = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts/status/1") // change the link
-    const result2 = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts/status/2")
-    setPosts([...result1.data, ...result2.data])
+
+    async function fetchData() {
+      // Query data from a table named 'todos'
+      let { data: POST, error } = await supabase
+        .from('POST')
+        .select('*')
+        // .eq('POST_STATUS', status)
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setData(POST);
+      }
+    }
+
+    const results = fetchData()
+    setPosts(results)
+    
     setPageTitle("BackItUp • Equity crowd-funding made easy")
+    // const result1 = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts/status/1") // change the link
+    // const result2 = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts/status/2")
+    // setPosts([...result1.data, ...result2.data])
     setLoading(false)
     // console.log(result.data);
   }

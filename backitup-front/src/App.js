@@ -31,8 +31,11 @@ import About from './pages/About';
 import { gapi } from 'gapi-script'
 import AdminPassword from './pages/admin/AdminPassword'
 import Resources from './pages/get-started/Resources';
+import { createClient } from '@supabase/supabase-js'
 
 function App() {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   const [isAuth, setIsAuth] = useState({ isLoggedIn: false, userID: null })
   const [currUser, setCurrUser] = useState({})
