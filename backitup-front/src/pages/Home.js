@@ -37,8 +37,17 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
       }
     }
 
-    const results = fetchData()
-    setPosts(results)
+    async function getDataAndSetPosts() {
+      try {
+        const results = await fetchData();
+        setPosts(results);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+    
+    // Call getDataAndSetPosts to fetch data and set the state
+    getDataAndSetPosts();
     
     setPageTitle("BackItUp • Equity crowd-funding made easy")
     // const result1 = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts/status/1") // change the link
