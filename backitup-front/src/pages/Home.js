@@ -39,7 +39,7 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setPosts(POST.data);
+        setPosts(POST.post);
         console.log(POST);
       }
     }
