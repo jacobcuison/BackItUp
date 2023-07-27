@@ -100,21 +100,21 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
           </div>
           <div className="grid-container">
             {postsToShow.map((post, index) => (
-              <Link key={index} className="card-container text-right" to={'/post/' + post.postID}>
+              <Link key={index} className="card-container text-right" to={'/post/' + post.POST_ID}>
                 <div className="card">
                   <div className="image-container">
 
                     <img
                       className="card-img-top"
-                      src={post.postPhotoURL == null ? "/images/post/post-default.png" : post.postPhotoURL}
+                      src={post.postPhotoURL == null ? "/images/post/post-default.png" : post.POST_PHOTOURL}
                       alt="Card image cap"
                     />
 
                   </div>
                   <div className="card-body" style={{ textAlign: "left" }}>
-                    <p className="card-text text-left display-6 fw-bold">{post.postTitle}</p>
-                    <p className="card-text">{post.postDescription}</p>
-                    {post.postSustainable
+                    <p className="card-text text-left display-6 fw-bold">{post.POST_TITLE}</p>
+                    <p className="card-text">{post.POST_DESCRIPTION}</p>
+                    {post.POST_SUSTAINABLE
                       ?
                       <img
                         className="eco-icon"
