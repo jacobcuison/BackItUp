@@ -86,7 +86,7 @@ public class userController {
 
     //Editing User
     @PostMapping("/api/editUser/{id}")
-    User newCompany(@RequestBody UserEdit resp, @PathVariable("id") Integer creatorId) {
+    User editUser(@RequestBody UserEdit resp, @PathVariable("id") Integer creatorId) {
 
         User user = userRepository.findById(creatorId).get();
 

@@ -48,7 +48,7 @@ public class Post {
     @Column(name = "POST_RAISE_DT")
     private LocalDateTime postRaiseDT;
 
- @Column(name = "POST_EXPIRE_DT")
+    @Column(name = "POST_EXPIRE_DT")
     private LocalDateTime postExpireDT;
 
     @Column(name = "POST_FINALISING_DT")

@@ -22,7 +22,7 @@ public class PostCreation {
     private boolean postSustainable;
 
     // Constructors, getters, and setters
-    public PostCreation(String postTitle, String postDescription, String postContent, String postURL,boolean postSustainable, int userID, int shareCountTotal, int shareCountMin, int shareCountCurrent, double shareCountPrice, int postStatus, LocalDateTime postCreateDT, LocalDateTime postExpireDT, LocalDateTime postRaiseDT) {
+    public PostCreation(String postTitle, String postDescription, String postContent, String postURL, boolean postSustainable, int userID, int shareCountTotal, int shareCountMin, int shareCountCurrent, double shareCountPrice, LocalDateTime postCreateDT, LocalDateTime postExpireDT, LocalDateTime postRaiseDT) {
         this.postTitle = postTitle;
         this.postDescription = postDescription;
         this.postContent = postContent;

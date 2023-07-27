@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin("https://backitup.mysql.database.azure.com/")
@@ -19,7 +20,39 @@ public class topupController {
     private userRepo userRepository;
     @Autowired
     private notificationRepo notificationRepository;
-    @PostMapping("/api/topup")
+
+//    @BeforeEach
+//    void setUp() {
+//        this.mockMvc = MockMvcBuilders.standaloneSetup(new topupController(WALLETRepository, topupRepository, userRepository, notificationRepository)).build();
+//
+//        this.WalletOne = new Wallet(10, 0);
+//        this.WalletOne.setWallet_ID(1);
+//
+//        this.WalletTwo = new Wallet(10, 0);
+//        this.WalletTwo.setWallet_ID(2);
+//
+//        this.TopupRespOne = new TopupResponse(1, 5, 8173213, LocalDateTime.now(), 0, "test");
+//        this.TopupRespTwo = new TopupResponse(2, 5, 8173213, LocalDateTime.now(), 0, "test");
+//
+//        this.topupOne = new Topup(WalletOne, TopupRespOne.getTopupAmount(), TopupRespOne.getTopupPaynow(), TopupRespOne.isTopupVerified(), TopupRespOne.getTopupDT(), TopupRespOne.getTopupEvidence());
+//        this.topupTwo = new Topup(WalletTwo, TopupRespTwo.getTopupAmount(), TopupRespTwo.getTopupPaynow(), TopupRespTwo.isTopupVerified(), TopupRespTwo.getTopupDT(), TopupRespTwo.getTopupEvidence());
+//
+//        this.userOne = new User("Jason", "jason@gmail.com", "8175422", "password", "Founder", "", "linkedin.com", true);
+//        this.userTwo = new User("Jacky", "jacky@gmail.com", "8175422", "password", "Founder", "", "linkedin.com", true);
+//
+//        userOne.setWallet(WalletOne);
+//        userOne.setUserID(1);
+//        userTwo.setWallet(WalletTwo);
+//        userTwo.setUserID(2);
+//
+//        when(topupRepository.findById(2)).thenReturn(Optional.ofNullable(topupOne));
+//        when(topupRepository.findById(2)).thenReturn(Optional.ofNullable(topupTwo));
+//
+//        when(userRepository.findById(1)).thenReturn(Optional.ofNullable(userOne));
+//        when(userRepository.findById(2)).thenReturn(Optional.ofNullable(userTwo));
+//
+//    }
+        @PostMapping("/api/topup")
     Topup newTopup(@RequestBody TopupResponse response) {
 
         Wallet wallet = WALLETRepository.findById(response.getWalletID()).get();
@@ -35,7 +68,7 @@ public class topupController {
     }
 
     @GetMapping("/api/topup/{verification}/{id}/{dt}")
-    boolean verifyWithdrawal(@PathVariable("id") Integer topID, @PathVariable("dt") LocalDateTime dt, @PathVariable("verification") String verification) {
+    boolean verifyTopup(@PathVariable("id") Integer topID, @PathVariable("dt") LocalDateTime dt, @PathVariable("verification") String verification) {
         Topup topup = topupRepository.findById(topID).get();
 
         if(topup == null){
@@ -78,6 +111,7 @@ public class topupController {
 
     @GetMapping("/api/listTopup")
     List<Topup> getAllTopUp() {
+
         return topupRepository.findAll();
     }
 
