@@ -34,6 +34,7 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
         console.error('Error fetching data:', error);
       } else {
         setData(POST);
+        console.log(POST);
       }
     }
 
