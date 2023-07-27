@@ -22,10 +22,9 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
   }, []);
 
   // Get list of posts from database
-  const loadPosts = async () => {
+  const loadPosts = async () => { 
 
     async function fetchData() {
-      // Query data from a table named 'todos'
       let { data: POST, error } = await supabase
         .from('POST')
         .select('*')
