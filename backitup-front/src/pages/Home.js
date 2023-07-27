@@ -8,6 +8,10 @@ import Loader from '../components/Loader'
 
 export default function Home({ setPageTitle, setUserType, isAuth }) {
 
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
+
+
   // Initialise homepage to be blank
   const [loading, setLoading] = useState(true)
   const [posts, setPosts] = useState([])
@@ -33,22 +37,22 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setData(POST);
+        setPosts(POST);
         console.log(POST);
       }
     }
 
-    async function getDataAndSetPosts() {
-      try {
+    // async function getDataAndSetPosts() {
+    //   try {
         const results = await fetchData();
-        setPosts(results);
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
+        // setPosts(results);
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //   }
+    // }
     
     // Call getDataAndSetPosts to fetch data and set the state
-    getDataAndSetPosts();
+    // getDataAndSetPosts();
     
     setPageTitle("BackItUp • Equity crowd-funding made easy")
     // const result1 = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts/status/1") // change the link
