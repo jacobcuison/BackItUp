@@ -21,7 +21,7 @@ export default function PaymentsList() {
       let { data: PAYMENT, error } = await supabase
         .from('PAYMENT')
         .select('*')
-        .eq('WALLET_ID', id)
+        // .eq('WALLET_ID', id)
 
       if (error) {
         console.error('Error fetching data:', error);

@@ -40,11 +40,12 @@ export default function TopupList() {
   }
 
   const clickVerify = async (TOPUP_ID) => {
-
+    
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
 
     async function fetchData() {
+
       let { data, error } = await supabase
         .from('TOPUP')
         .update({ TOPUP_VERIFIED : 1 })
@@ -56,7 +57,7 @@ export default function TopupList() {
         console.error('Error fetching data:', error);
       } else {
         // setPosts(POST);
-        console.log(POST);
+        // console.log(POST);
         alert("Successfully verified! Please refresh the page.")
       }
     }
@@ -68,6 +69,10 @@ export default function TopupList() {
   }
 
   const clickUnverify = async (TOPUP_ID) => {
+    
+    const date = new Date();
+    const formattedDate = date.toISOString().substr(0, 19);
+
     async function fetchData() {
       let { data, error } = await supabase
         .from('TOPUP')
@@ -80,7 +85,7 @@ export default function TopupList() {
         console.error('Error fetching data:', error);
       } else {
         // setPosts(POST);
-        console.log(POST);
+        // console.log(POST);
         alert("Successfully unverified! Please refresh the page.")
       }
     }
