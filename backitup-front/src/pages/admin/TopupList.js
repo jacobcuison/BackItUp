@@ -34,7 +34,7 @@ export default function TopupList() {
     
     
     // const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listTopup")
-    // console.log(result);
+    console.log(users);
     // setUsers(result.data)
     // console.log(result.data);
   }
@@ -117,7 +117,7 @@ export default function TopupList() {
                 <tr>
                   <th scope="row" key="index">{index + 1}</th>
                   <td>{user.TOPUP_DT}</td>
-                  <td>{user.WALLET.WALLET_ID}</td>
+                  <td>{user.WALLET_ID}</td>
                   <td>{user.TOPUP_ID}</td>
                   <td>{user.TOPUP_AMOUNT}</td>
                   <td>
