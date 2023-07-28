@@ -110,7 +110,7 @@ export default function WithdrawalList() {
                 <tr>
                   <th scope="row" key="index">{index + 1}</th>
                   <td>{wd.WITHDRAWAL_DT}</td>
-                  <td>{wd.WALLET.WALLET_ID}</td>
+                  <td>{wd.WALLET_ID}</td>
                   <td>{wd.WITHDRAWAL_ID}</td>
                   <td>{wd.WITHDRAWAL_AMOUNT}</td>
                   <td>
