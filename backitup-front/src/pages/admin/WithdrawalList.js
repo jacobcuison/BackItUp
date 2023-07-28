@@ -13,24 +13,76 @@ export default function WithdrawalList() {
 
   // Get list of users from database
   const loadWds = async () => {
-    const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listWithdrawal")
-    console.log(result);
-    setWds(result.data)
-    console.log(result.data);
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from('WITHDRAWAL')
+        .select('*')
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setWds(data);
+        console.log(data);
+      }
+    }
+
+    await fetchData();
+    
+    // const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listWithdrawal")
+    // console.log(result);
+    // setWds(result.data)
+    // console.log(result.data);
   }
 
-  const clickVerify = (withdrawalID) => {
+  const clickVerify = async (WITHDRAWAL_ID) => {
     const date = new Date();
     const dt = date.toISOString().substr(0, 19);
-    axios.get(`https://orbital-1690146023037.azurewebsites.net/api/withdrawal/verify/${withdrawalID}/${dt}`)
-    alert("Successfully verified! Please refresh the page.")
+    
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from('WITHDRAWAL')
+        .update({ WITHDRAWAL_VERIFIED : 1 })
+        .eq('WITHDRAWAL_ID', WITHDRAWAL_ID)
+        .select()
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        // setPosts(POST);
+        // console.log(POST);
+        alert("Successfully verified! Please refresh the page.")
+      }
+    }
+
+    await fetchData()
+    
+    // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/withdrawal/verify/${withdrawalID}/${dt}`)
+    // alert("Successfully verified! Please refresh the page.")
   }
 
-  const clickUnverify = (withdrawalID) => {
+  const clickUnverify = async (WITHDRAWAL_ID) => {
     const date = new Date();
     const dt = date.toISOString().substr(0, 19);
-    axios.get(`https://orbital-1690146023037.azurewebsites.net/api/withdrawal/unverify/${withdrawalID}/${dt}`)
-    alert("Successfully unverified! Please refresh the page.")
+    
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from('WITHDRAWAL')
+        .update({ WITHDRAWAL_VERIFIED : -1 })
+        .eq('WITHDRAWAL_ID', WITHDRAWAL_ID)
+        
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        // setPosts(POST);
+        // console.log(POST);
+        alert("Successfully unverified! Please refresh the page.")
+      }
+    }
+
+    await fetchData()
+    
+    // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/withdrawal/unverify/${withdrawalID}/${dt}`)
+    // alert("Successfully unverified! Please refresh the page.")
   }
 
   return (
@@ -53,17 +105,17 @@ export default function WithdrawalList() {
               wds.map((wd, index) => (
                 <tr>
                   <th scope="row" key="index">{index + 1}</th>
-                  <td>{wd.withdrawalDT}</td>
-                  <td>{wd.wallet.walletId}</td>
-                  <td>{wd.withdrawalID}</td>
-                  <td>{wd.withdrawalAmount}</td>
+                  <td>{wd.WITHDRAWAL_DT}</td>
+                  <td>{wd.WALLET.WALLET_ID}</td>
+                  <td>{wd.WITHDRAWAL_ID}</td>
+                  <td>{wd.WITHDRAWAL_AMOUNT}</td>
                   <td>
-                    {wd.pendingStatus == true
-                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(wd.withdrawalID)}>Verify</button>
-                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(wd.withdrawalID)}>Unverify</button>
+                    {wd.PENDING_STATUS == true
+                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(wd.WITHDRAWAL_ID)}>Verify</button>
+                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(wd.WITHDRAWAL_ID)}>Unverify</button>
                     }
                   </td>
-                  <td>{wd.withdrawalDoneDT}</td>
+                  <td>{wd.WITHDRAWAL_DONE_DT}</td>
                 </tr>
               ))
             }

@@ -13,24 +13,80 @@ export default function PostList() {
 
   // Get list of users from database
   const loadPosts = async () => {
-    const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts")
-    console.log(result);
-    setPosts(result.data)
-    console.log(result.data);
+    async function fetchData() {
+      let { data: POST, error } = await supabase
+        .from('POST')
+        .select('*')
+        // .eq('POST_STATUS', status)
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setPosts(POST);
+        console.log(POST);
+      }
+    }
+
+    const results = await fetchData();
+    
+    // const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts")
+    // console.log(result);
+    // setPosts(result.data)
+    // console.log(result.data);
   }
 
-  const clickVerify = (postID) => {
+  const clickVerify = async (POST_ID) => {
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
-    axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/verify/${postID}/${formattedDate}`)
-    alert("Successfully verified! Please refresh the page.")
+
+    async function fetchData() {
+      let { data: POST, error } = await supabase
+        .from('POST')
+        .update({ POST_STATUS : 1 })
+        .update({ POST_APPROVED_DT: formattedDate })
+        .eq('POST_ID', POST_ID)
+        .select()
+    
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        // setPosts(POST);
+        console.log(POST);
+        alert("Successfully verified! Please refresh the page.")
+      }
+    }
+
+    await fetchData();
+    
+    // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/verify/${postID}/${formattedDate}`)
+    
   }
 
-  const clickUnverify = (postID) => {
+  const clickUnverify = async (POST_ID) => {
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
-    axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/unverify/${postID}/${formattedDate}`)
-    alert("Successfully unverified! Please refresh the page.")
+
+    async function fetchData() {
+      let { data: POST, error } = await supabase
+        .from('POST')
+        .update({ POST_STATUS : -1 })
+        .update({ POST_APPROVED_DT: formattedDate })
+        .eq('POST_ID', POST_ID)
+        .select()
+    
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        // setPosts(POST);
+        console.log(POST);
+        alert("Successfully unverified! Please refresh the page.")
+      }
+    }
+
+    await fetchData();
+
+    // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/unverify/${postID}/${formattedDate}`)
+    // alert("Successfully unverified! Please refresh the page.")
   }
 
   return (
@@ -53,14 +109,14 @@ export default function PostList() {
               posts.map((post, index) => (
                 <tr>
                   <th scope="row" key="index">{index + 1}</th>
-                  <td>{post.postCreateDT}</td>
-                  <td>{post.postTitle}</td>
-                  <td>{post.postDescription}</td>
-                  <td>{post.postURL}</td>
+                  <td>{post.POST_CREATE_DT}</td>
+                  <td>{post.POST_TITLE}</td>
+                  <td>{post.POST_DESCRIPTION}</td>
+                  <td>{post.POST_URL}</td>
                   <td>
-                    {post.pendingStatus
-                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(post.postID)}>Verify</button>
-                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(post.postID)}>Unverify</button>
+                    {post.PENDING_STATUS
+                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(post.POST_ID)}>Verify</button>
+                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(post.POST_ID)}>Unverify</button>
                     }
                   </td>
                   <td>{post.postApprovedDT}</td>

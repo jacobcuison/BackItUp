@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Link } from "react-router-dom"
 
-export default function UsersList() {
+export default function TopupList() {
 
   // Initialise homepage to be blank
   const [users, setUsers] = useState([])
@@ -13,22 +13,78 @@ export default function UsersList() {
 
   // Get list of users from database
   const loadUsers = async () => {
-    const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listTopup")
-    console.log(result);
-    setUsers(result.data)
-    console.log(result.data);
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from('TOPUP')
+        .select('*')
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setUsers(data);
+        console.log(data);
+      }
+    }
+
+    await fetchData();
+    
+    
+    // const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listTopup")
+    // console.log(result);
+    // setUsers(result.data)
+    // console.log(result.data);
   }
 
-  const clickVerify = (user) => {
+  const clickVerify = async (TOPUP_ID) => {
+
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
-    axios.get(`https://orbital-1690146023037.azurewebsites.net/api/topup/verify/${user.topupID}/${formattedDate}`)
-    alert("Successfully verified! Please refresh the page.")
+
+    async function fetchData() {
+      let { data, error } = await supabase
+        .from('TOPUP')
+        .update({ TOPUP_VERIFIED : 1 })
+        .update({ TOPUP_APPROVED_DT: formattedDate })
+        .eq('TOPUP_ID', TOPUP_ID)
+        .select()
+    
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        // setPosts(POST);
+        console.log(POST);
+        alert("Successfully verified! Please refresh the page.")
+      }
+    }
+
+    await fetchData();
+
+    // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/topup/verify/${user.topupID}/${formattedDate}`)
+    // alert("Successfully verified! Please refresh the page.")
   }
 
-  const clickUnverify = (userID) => {
-    axios.get(`https://orbital-1690146023037.azurewebsites.net/${userID}/unverify`)
-    alert("Successfully unverified! Please refresh the page.")
+  const clickUnverify = async (TOPUP_ID) => {
+    async function fetchData() {
+      let { data, error } = await supabase
+        .from('TOPUP')
+        .update({ TOPUP_VERIFIED : -1 })
+        .update({ TOPUP_APPROVED_DT: formattedDate })
+        .eq('TOPUP_ID', TOPUP_ID)
+        .select()
+    
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        // setPosts(POST);
+        console.log(POST);
+        alert("Successfully unverified! Please refresh the page.")
+      }
+    }
+
+    await fetchData();
+
+    // axios.get(`https://orbital-1690146023037.azurewebsites.net/${userID}/unverify`)
+    // alert("Successfully unverified! Please refresh the page.")
   }
 
   return (
@@ -51,17 +107,17 @@ export default function UsersList() {
               users.map((user, index) => (
                 <tr>
                   <th scope="row" key="index">{index + 1}</th>
-                  <td>{user.topupDT}</td>
-                  <td>{user.wallet.walletId}</td>
-                  <td>{user.topupID}</td>
-                  <td>{user.topupAmount}</td>
+                  <td>{user.TOPUP_DT}</td>
+                  <td>{user.WALLET.WALLET_ID}</td>
+                  <td>{user.TOPUP_ID}</td>
+                  <td>{user.TOPUP_AMOUNT}</td>
                   <td>
-                    {user.pendingStatus
-                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(user)}>Verify</button>
-                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(user)}>Unverify</button>
+                    {user.PENDING_STATUS
+                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(user.TOPUP_ID)}>Verify</button>
+                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(user.TOPUP_ID)}>Unverify</button>
                     }
                   </td>
-                  <td>{user.topupDoneDT}</td>
+                  <td>{user.TOPUP_DONE_DT}</td>
                 </tr>
               ))
             }

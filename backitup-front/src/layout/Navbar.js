@@ -11,7 +11,7 @@ import { Button } from 'react-bootstrap';
 
 export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
 
-  const [isCompany, setIsCompany] = useState(false)
+  // const [isCompany, setIsCompany] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
 
   console.log(isAuth.isLoggedIn, "status of log in");
@@ -19,19 +19,37 @@ export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
 
   useEffect(() => {
     loadData()
-    console.log(isCompany, "my current company");
+    // console.log(isCompany, "my current company");
   }, [])
 
   const loadData = async () => {
-    const isCompanyResponse =
-      axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyCompany/${currUser.userEmail}/${currUser.userPass}`)
-    const isComp = isCompanyResponse.data
-    if (isComp === null || isComp === undefined) {
-      setIsCompany(false)
-    } else {
-      setIsCompany(true)
-    }
-    console.log(isCompany, "MY CURENT COMPANY");
+
+    // async function fetchData() {
+    //   let { data: POST, error } = await supabase
+    //     .from('USER')
+    //     .select('*')
+    //     .eq('USER_EMAIL', EMAIL)
+    //     .eq('USER_PASSWORD', Password)
+
+    //   if (error) {
+    //     console.error('Error fetching data:', error);
+    //   } else {
+    //     setPosts(POST);
+    //     console.log(POST);
+    //   }
+    // }
+
+    // const results = await fetchData();
+
+    // const isCompanyResponse =
+    //   axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyCompany/${currUser.userEmail}/${currUser.userPass}`)
+    // const isComp = isCompanyResponse.data
+    // if (isComp === null || isComp === undefined) {
+    //   setIsCompany(false)
+    // } else {
+    //   setIsCompany(true)
+    // }
+    // console.log(isCompany, "MY CURENT COMPANY");
   }
 
   const handleNotifToggle = () => {
