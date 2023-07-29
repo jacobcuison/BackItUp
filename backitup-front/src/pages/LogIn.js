@@ -93,7 +93,7 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
         } else {
           setCurrUser(USER)
           setUserType(`${USER.USER_TYPE}`)
-          // console.log(POST);
+          console.log(USER, "result of fetchUser API call");
         }
       }
 
