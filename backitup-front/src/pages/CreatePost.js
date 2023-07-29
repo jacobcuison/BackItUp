@@ -23,7 +23,8 @@ export default function CreatePost({ currUser, setPageTitle }) {
     SHARE_COUNT_TOTAL: "",
     SHARE_COUNT_PRICE: "",
     SHARE_COUNT_MIN: "",
-    post_RAISED_DT: ""
+    post_RAISED_DT: "",
+    photoURL: ""
   })
 
   const [postRaiseDate, setPostRaiseDate] = useState(new Date());
@@ -32,7 +33,7 @@ export default function CreatePost({ currUser, setPageTitle }) {
   const [photo, setPhoto] = useState(null)
 
   const { post_TITLE, post_CONTENT, post_DESCRIPTION, post_SUSTAINABLE, postURL,
-    SHARE_COUNT_TOTAL, SHARE_COUNT_PRICE, SHARE_COUNT_MIN, post_RAISED_DT } = post;
+    SHARE_COUNT_TOTAL, SHARE_COUNT_PRICE, SHARE_COUNT_MIN, post_RAISED_DT, photoURL } = post;
 
   const [checked, setChecked] = useState(false)
   const [value, setValue] = useState("0")
@@ -117,8 +118,8 @@ export default function CreatePost({ currUser, setPageTitle }) {
           let { data: POST, error } = await supabase
             .from('POST')
             .select('*')
-            // .eq('POST_STATUS', status)
-    
+          // .eq('POST_STATUS', status)
+
           if (error) {
             console.error('Error fetching data:', error);
           } else {
@@ -131,13 +132,13 @@ export default function CreatePost({ currUser, setPageTitle }) {
 
         let { data, error } = await supabase
           .from('POST')
-          .update({ POST_PHOTOURL: PHOTO_URL })
+          .update({ POST_PHOTOURL: photoURL })
           .eq('POST_ID', count)
 
         if (error) {
           console.error('Error fetching data:', error);
         } else {
-          setInvsPost(POST);
+          // setInvsPost(POST);
           // console.log(POST);
         }
       }
@@ -397,15 +398,25 @@ export default function CreatePost({ currUser, setPageTitle }) {
             </div>
 
             <div className='col-md-4'>
-              <label className='form-label'>Photo</label>
-              <input
-                type={"file"}
-                className="form-control"
-                name="Photo"
-                onChange={(event) => handleFileChange(event)}
-              />
+              <div className="mb-3">
+                <label
+                  htmlFor="Pitch"
+                  className="form-label">
+                  Link to Pitch Deck
+                </label>
+                <input
+                  required type={"text"}
+                  className="form-control"
+                  placeholder="Google Drive, Dropbox, etc"
+                  name="photoURL"
+                  value={photoURL}
+                  onChange={(event) => handleChange(event)}
+                />
+                <small id="urlHelp"
+                  className="form-text text-muted">Please ensure that the link is visible to the public.</small>
+              </div>
+              <button type="submit" className="btn btn-solid-dark">Submit</button>
             </div>
-            <button type="submit" className="btn btn-solid-dark">Submit</button>
           </div>
         </form>
       </div>

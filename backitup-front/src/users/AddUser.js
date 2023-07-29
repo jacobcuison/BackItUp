@@ -239,7 +239,7 @@ export default function AddUser({ setPageTitle, setUserType }) {
             console.error('Error fetching data:', error);
           } else {
             return USER.length
-            console.log(POST);
+            // console.log(POST);
           }
         }
 

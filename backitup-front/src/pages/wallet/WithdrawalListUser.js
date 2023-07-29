@@ -22,7 +22,7 @@ export default function WithdrawalListUser({wallet}) {
         let { data: USER, error } = await supabase
           .from('WITHDRAWAL')
           .select('*')
-          .eq('WALLET_ID', id)
+          .eq('WALLET_ID', wallet.WALLET_ID)
   
         if (error) {
           console.error('Error fetching data:', error);
