@@ -103,7 +103,7 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
           .from('USER')
           .select('*')
           .eq('USER_EMAIL', email)
-          .eq('USER_PASSWORD', password)
+          .eq('USER_PASS', password)
         if (error) {
           alert('You have input an incorrect email/password. Please refresh and try again.')
         } else {
