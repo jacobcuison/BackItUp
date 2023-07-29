@@ -40,11 +40,13 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
           // console.log(POST);
         }
       }
-      const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/${id}`) // change the link as necessary
-      setPost(result.data);
-      setShare((result.data.share.shareCountCurrent * 100) / result.data.share.shareCountTotal);
-      setPageTitle(`${result.data.postTitle} • BackItUp`);
-      setLoading(false)
+
+      await fetchPost()
+      // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/${id}`) // change the link as necessary
+      // setPost(result.data);
+      // setShare((result.data.share.shareCountCurrent * 100) / result.data.share.shareCountTotal);
+      // setPageTitle(`${result.data.postTitle} • BackItUp`);
+      // setLoading(false)
     } catch (error) {
       // console.log(error);
     }

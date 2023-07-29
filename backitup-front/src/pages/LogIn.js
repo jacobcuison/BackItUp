@@ -111,6 +111,8 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
           await fetchUser().then(navigate('/'))
         }
       }
+
+      await logIn()
       // const details = {
       //   userEmail: email,
       //   userPass: password
