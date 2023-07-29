@@ -5,24 +5,28 @@ import { useNavigate } from 'react-router-dom'
 import pwShow from '../images/pw-show.png'
 import pwHide from '../images/pw-hide.png'
 import logoWords from "../images/logo-words.png"
+import { createClient } from '@supabase/supabase-js'
 
 import "../styles/styles.css"
 
 export default function ViewUser({ currUser }) {
 
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
+
   let navigate = useNavigate()
 
   const [show, setShow] = useState(true);
   const [user, setUser] = useState({
-    userName: currUser.userName,
-    userEmail: currUser.userEmail,
-    userHP: currUser.userHP,
-    userPass: currUser.userPass,
-    userType: currUser.userType,
-    userVerified: currUser.userVerified,
-    userEvidence: currUser.userEvidence,
-    userLinkedinLink: currUser.userLinkedinLink,
-    userShowContact: currUser.userShowContact
+    userName: currUser.USER_NAME,
+    userEmail: currUser.USER_EMAIL,
+    userHP: currUser.USER_HP,
+    userPass: currUser.USER_PASS,
+    userType: currUser.USER_TYPE,
+    userVerified: currUser.USER_VERIFIED,
+    userEvidence: currUser.USER_EVIDENCE,
+    userLinkedinLink: currUser.USER_LINKEDINLINK,
+    userShowContact: currUser.USER_SHOWCONTACT,
+    userPhotoURL: currUser.USER_PHOTOURL
   })
 
   const [photo, setPhoto] = useState(null)
@@ -63,49 +67,73 @@ export default function ViewUser({ currUser }) {
   const onSubmit = async (event) => {
     event.preventDefault()
     try {
+      async function updateUser() {
+        const { data, error } = await supabase
+          .from('USER')
+          .update({ USER_NAME: user.userName })
+          .update({ USER_EMAIL: user.userEmail })
+          .update({ USER_HP: user.userHP })
+          .update({ USER_PASS: user.userPass })
+          .update({ USER_TYPE: user.userType })
+          .update({ USER_EVIDENCE: user.userEvidence })
+          .update({ USER_LINKEDINLINK: user.userLinkedinLink })
+          .update({ USER_SHOWCONTACT: user.userShowContact })
+          .update({ USER_PHOTOURL: user.userPhotoURL})
+          .eq('USER_ID', currUser.USER_ID)
+          .select()
 
-      // Create a user with the created wallet.java
-      const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/editUser/${currUser.userID}`, user, {
-        headers: {
-          'Content-Type': 'application/json'
+        if (error) {
+          console.log(error);
+        } else {
+
         }
+
       }
 
-      );
-      setIsEdit(!isEdit)
+      await updateUser().then(setIsEdit(!isEdit))
+
+      // // Create a user with the created wallet.java
+      // const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/editUser/${currUser.userID}`, user, {
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // }
+
+      // );
+      // setIsEdit(!isEdit)
 
     } catch (error) {
       console.error(error);
       console.log("Edit User failed")
     }
 
-    try {
-      // Upload photo to local source folder
-      const photoFormData = new FormData()
-      photoFormData.append('file', photo)
+    // try {
+    //   // Upload photo to local source folder
+    //   const photoFormData = new FormData()
+    //   photoFormData.append('file', photo)
 
-      await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/user/submitPhoto/${currUser.userID}`, photoFormData)
-        .then((response) => {
-          console.log("Successful image upload", response.data);
-        })
+    //   await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/user/submitPhoto/${currUser.userID}`, photoFormData)
+    //     .then((response) => {
+    //       console.log("Successful image upload", response.data);
+    //     })
 
-    } catch (error) {
-      console.log("Error uploading image", error);
-    }
+    // } catch (error) {
+    //   console.log("Error uploading image", error);
+    // }
 
-    try {
-      // Upload photo to local source folder
-      const evidenceFormData = new FormData()
-      evidenceFormData.append('file', evidence)
+    // try {
+    //   // Upload photo to local source folder
+    //   const evidenceFormData = new FormData()
+    //   evidenceFormData.append('file', evidence)
 
-      await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/user/submitEvidence/${currUser.userID}`, evidenceFormData)
-        .then((response) => {
-          console.log("Successful evidence upload", response.data);
-        })
+    //   await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/user/submitEvidence/${currUser.userID}`, evidenceFormData)
+    //     .then((response) => {
+    //       console.log("Successful evidence upload", response.data);
+    //     })
 
-    } catch (error) {
-      console.log("Error uploading evidence", error);
-    }
+    // } catch (error) {
+    //   console.log("Error uploading evidence", error);
+    // }
   };
 
   return (

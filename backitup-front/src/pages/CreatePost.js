@@ -6,8 +6,11 @@ import moment from 'moment'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../styles/styles.css'
+import { createClient } from '@supabase/supabase-js'
 
 export default function CreatePost({ currUser, setPageTitle }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   let navigate = useNavigate()
 
@@ -58,49 +61,135 @@ export default function CreatePost({ currUser, setPageTitle }) {
     try {
       const date = new Date();
       const formattedDate = date.toISOString().substr(0, 19);
-      const pdata = {
-        postTitle: post_TITLE,
-        postDescription: post_DESCRIPTION,
-        postContent: post_CONTENT,
-        postURL: postURL,
-        postSustainable: checked,
-        shareCountTotal: parseInt(SHARE_COUNT_TOTAL),
-        shareCountMin: parseInt(SHARE_COUNT_MIN),
-        shareCountCurrent: 0,
-        shareCountPrice: parseFloat(SHARE_COUNT_PRICE),
-        postStatus: 0,
-        postCreateDT: formattedDate,
-        postRaisedDT: postRaiseDate.toISOString().substr(0, 19),
-        postExpireDT: postEndDate.toISOString().substr(0, 19),
-        userID: currUser.userID
-      };
 
-      console.log(pdata)
+      let shareId = -1;
 
-      // Create a user with the created wallet.java
-      const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/createPost`, pdata, {
-        headers: {
-          'Content-Type': 'application/json'
+      async function insertShare() {
+        const { data, error } = await supabase
+          .from('SHARE')
+          .insert([
+            {
+              SHARE_COUNT_TOTAL: parseInt(SHARE_COUNT_TOTAL),
+              SHARE_COUNT_MIN: parseInt(SHARE_COUNT_MIN),
+              SHARE_COUNT_CURRENT: 0,
+              SHARE_COUNT_PRICE: parseFloat(SHARE_COUNT_PRICE),
+            },
+          ])
+          .select('SHARE_ID')
+
+        if (error) {
+          console.log('Error inserting share: ', error);
+        } else {
+          shareId = data
         }
       }
 
-      );
-      const photoFormData = new FormData()
-      photoFormData.append('file', photo)
+      async function insertData() {
+        const { data, error } = await supabase
+          .from('POST')
+          .insert([
+            {
+              POST_TITLE: post_TITLE,
+              POST_DESCRIPTION: post_DESCRIPTION,
+              POST_CONTENT: post_CONTENT,
+              POST_URL: postURL,
+              POST_SUSTAINABLE: checked,
+              POST_STATUS: 0,
+              POST_CREATE_DT: formattedDate, // Replace with an appropriate date and time
+              POST_EXPIRE_DT: postEndDate.toISOString().substr(0, 19), // Replace with an appropriate date and time
+              POST_RAISE_DT: postRaiseDate.toISOString().substr(0, 19), // Replace with an appropriate date and time
+              SHARE_ID: shareId,
+              USER_ID: currUser.USER_ID,
+            },
+          ])
+          .select()
 
-      // Get current post ID
-      let count = 0
+        if (error) {
+          console.log('Error inserting share: ', error);
+        } else {
+          //
+        }
+      }
 
-      const postList = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts")
-      console.log("currPOSTID:::", postList.data.length);
+      async function insertPhoto() {
 
-      await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/post/submitPhoto/${postList.data.length}`,
-        photoFormData)
-        .then((response) => {
-          console.log("Successful image upload", response.data);
-        })
+        async function countPosts() {
+          let { data: POST, error } = await supabase
+            .from('POST')
+            .select('*')
+            // .eq('POST_STATUS', status)
+    
+          if (error) {
+            console.error('Error fetching data:', error);
+          } else {
+            return POST.length
+            console.log(POST);
+          }
+        }
 
-      console.log("post creation success");
+        let count = await countPosts()
+
+        let { data, error } = await supabase
+          .from('POST')
+          .update({ POST_PHOTOURL: PHOTO_URL })
+          .eq('POST_ID', count)
+
+        if (error) {
+          console.error('Error fetching data:', error);
+        } else {
+          setInvsPost(POST);
+          // console.log(POST);
+        }
+      }
+
+      await insertData()
+        .then(await insertShare())
+        .then(await insertPhoto())
+        .then(navigate("/"))
+
+      // const pdata = {
+      //   postTitle: post_TITLE,
+      //   postDescription: post_DESCRIPTION,
+      //   postContent: post_CONTENT,
+      //   postURL: postURL,
+      //   postSustainable: checked,
+      //   shareCountTotal: parseInt(SHARE_COUNT_TOTAL),
+      //   shareCountMin: parseInt(SHARE_COUNT_MIN),
+      //   shareCountCurrent: 0,
+      //   shareCountPrice: parseFloat(SHARE_COUNT_PRICE),
+      //   postStatus: 0,
+      //   postCreateDT: formattedDate,
+      //   postRaisedDT: postRaiseDate.toISOString().substr(0, 19),
+      //   postExpireDT: postEndDate.toISOString().substr(0, 19),
+      //   userID: currUser.userID
+      // };
+
+      // console.log(pdata)
+
+      // Create a user with the created wallet.java
+      // const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/createPost`, pdata, {
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // }
+
+      // );
+      // const photoFormData = new FormData()
+      // photoFormData.append('file', photo)
+
+      // // Get current post ID
+      // let count = 0
+
+      // const postList = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listPosts")
+      // console.log("currPOSTID:::", postList.data.length);
+
+      // await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/post/submitPhoto/${postList.data.length}`,
+      //   photoFormData)
+      //   .then((response) => {
+      //     console.log("Successful image upload", response.data);
+      //   })
+
+      // console.log("post creation success");
 
     } catch (error) {
       console.error(error);

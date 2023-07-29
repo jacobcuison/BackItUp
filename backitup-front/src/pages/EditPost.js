@@ -7,8 +7,11 @@ import Loader from '../components/Loader'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../styles/styles.css'
+import { createClient } from '@supabase/supabase-js'
 
 export default function EditPost({ currUser, isAuth, setPageTitle }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   let navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -72,53 +75,72 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
   const onSubmit = async (event) => {
     event.preventDefault()
     try {
-      const apiUrl = `/api/editPost/${post.postID}`;
-      const date = new Date();
-      // const exp = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000)
-      // const formattedExp = exp.toISOString().substr(0, 19)
-      const formattedDate = date.toISOString().substr(0, 19);
-      const pdata = {
-        postTitle: postTitle,
-        postDescription: postDescription,
-        postContent: postContent,
-        postURL: postURL,
-        postSustainable: checked,
-        // shareCountTotal: parseInt(share.shareCountTotal),
-        // shareCountMin: parseInt(share.shareCountMin),
-        // shareCountCurrent: share.shareCountCurrent,
-        // shareCountPrice: parseFloat(share.shareCountPrice),
-        // postStatus: 0,
-        // postCreateDT: formattedDate,
-        // postRaiseDT: post.postCreateDT,
-        postExpireDT: post.postExpireDT,
-        // postRaisedDT: postRaiseDate.toISOString().substr(0, 19),
-        // postExpireDT: postEndDate.toISOString().substr(0, 19),
-        // userID: currUser.userID
-      };
 
-      console.log(pdata)
+      async function updatePost() {
+        const { data, error } = await supabase
+          .from('POST')
+          .update({ POST_TITLE: postTitle})
+          .update({ POST_DESCRIPTION: postDescription})
+          .update({ POST_CONTENT:  postContent})
+          .update({ POST_URL: postURL})
+          .update({ POST_SUSTAINABLE: checked})
+          .eq('POST_ID', post.POST_ID)
+          .select()
+        
+          if (error) {
+            console.error('Error updating data:', error);
+          } else {
+            navigate("/")
+          }
+      }
 
-      fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pdata)
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Handle the response data
-          console.log(data);
-        })
-      console.log("post updateeeeee success");
-      navigate("/")
+      await updatePost()
+
+    //   const apiUrl = `/api/editPost/${post.postID}`;
+    //   const date = new Date();
+    //   // const exp = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000)
+    //   // const formattedExp = exp.toISOString().substr(0, 19)
+    //   const formattedDate = date.toISOString().substr(0, 19);
+    //   const pdata = {
+    //     postTitle: postTitle,
+    //     postDescription: postDescription,
+    //     postContent: postContent,
+    //     postURL: postURL,
+    //     postSustainable: checked,
+    //     // shareCountTotal: parseInt(share.shareCountTotal),
+    //     // shareCountMin: parseInt(share.shareCountMin),
+    //     // shareCountCurrent: share.shareCountCurrent,
+    //     // shareCountPrice: parseFloat(share.shareCountPrice),
+    //     // postStatus: 0,
+    //     // postCreateDT: formattedDate,
+    //     // postRaiseDT: post.postCreateDT,
+    //     postExpireDT: post.postExpireDT,
+    //     // postRaisedDT: postRaiseDate.toISOString().substr(0, 19),
+    //     // postExpireDT: postEndDate.toISOString().substr(0, 19),
+    //     // userID: currUser.userID
+    //   };
+
+    //   console.log(pdata)
+
+    //   fetch(apiUrl, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(pdata)
+    //   })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       // Handle the response data
+    //       console.log(data);
+    //     })
+    //   console.log("post updateeeeee success");
+    //   navigate("/")
 
     } catch (error) {
       console.error(error);
       console.log("post edit failure")
     }
-
-
   };
 
   return (
@@ -153,7 +175,7 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   className="form-label">
                   Company
                 </label>
-                <input class="form-control" type="text" placeholder={`${post.user.userName}`} aria-label="Disabled input example" disabled></input>
+                <input class="form-control" type="text" placeholder={`${post.USER_NAME}`} aria-label="Disabled input example" disabled></input>
               </div>
               <div className="row">
                 <div className="col-md-11">
@@ -223,7 +245,7 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   className="form-control"
                   placeholder="999"
                   name="share.shareCountTotal"
-                  value={share.shareCountTotal}
+                  value={share.SHARE_COUNT_TOTAL}
                   onChange={(event) => handleChange(event)}
                 />
               </div>
@@ -242,7 +264,7 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                     className="form-control"
                     placeholder="Round off to the nearest 0.01"
                     name="share.shareCountPrice"
-                    value={share.shareCountPrice}
+                    value={share.SHARE_COUNT_PRICE}
                     onChange={(event) => handleChange(event)}
                   />
                 </div>
@@ -258,7 +280,7 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   className="form-control"
                   placeholder="1"
                   name="share.shareCountMin"
-                  value={share.shareCountMin}
+                  value={share.SHARE_COUNT_MIN}
                   onChange={(event) => handleChange(event)}
                 />
               </div>

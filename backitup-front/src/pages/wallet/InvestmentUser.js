@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import InvestmentRowTitle from './InvestmentRowTitle'
 import InvestmentRowView from './InvestmentRowView'
+import { createClient } from '@supabase/supabase-js'
 
 export default function InvestmentUser({ currUser }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   const [invs, setInvs] = useState([])
   const [invsPost, setInvsPost] = useState([])
@@ -14,11 +17,30 @@ export default function InvestmentUser({ currUser }) {
   }, []);
 
   const loadInvs = async () => {
-    const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listinvest/user/${currUser.userID}`)
-    setInvs(result.data)
+
+    async function fetchData() {
+      let { data: USER, error } = await supabase
+        .from('INVEST')
+        .select('*')
+        .eq('USER_ID', currUser.USER_ID)
+        // .eq('POST_STATUS', status)
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setInvs(USER);
+        console.log(USER);
+      }
+    }
+
+    const results = await fetchData();
+    // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listinvest/user/${currUser.userID}`)
+    // setInvs(result.data)
 
     // const post = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/postbyshare/${post.shareId}")`)
     // setInvsPost(post.data)
+
+    console.log("Invs for InvestmentUser.js: ", invs);
   }
 
   return (

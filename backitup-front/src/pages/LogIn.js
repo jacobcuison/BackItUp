@@ -9,8 +9,11 @@ import axios from 'axios'
 import "../styles/styles.css"
 import { GoogleLogin } from '@react-oauth/google'
 import jwt_decode from "jwt-decode"
+import { createClient } from '@supabase/supabase-js'
 
 export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserType }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   let navigate = useNavigate()
 
@@ -79,25 +82,54 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
   const onSubmit = async (event) => {
     event.preventDefault()
     try {
-      const details = {
-        userEmail: email,
-        userPass: password
+      async function fetchUser(USER_ID) {
+        let { data: USER, error } = await supabase
+          .from('USER')
+          .select('*')
+          .eq('USER_ID', USER_ID)
+
+        if (error) {
+          console.error('Error fetching data:', error);
+        } else {
+          setCurrUser(USER)
+          setUserType(`${USER.USER_TYPE}`)
+          // console.log(POST);
+        }
       }
 
-      console.log(password, "password submitted is")
+      await fetchUser()
+      async function logIn() {
+        let { data: USER, error } = await supabase
+          .from('USER')
+          .select('*')
+          .eq('USER_EMAIL', email)
+          .eq('USER_PASSWORD', password)
+        if (error) {
+          alert('You have input an incorrect email/password. Please refresh and try again.')
+        } else {
+          setIsAuth({ isLoggedIn: true, userID: USER })
+          await fetchUser().then(navigate('/'))
+        }
+      }
+      // const details = {
+      //   userEmail: email,
+      //   userPass: password
+      // }
 
-      const isVerified =
-        await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyUser/${details.userEmail}/${details.userPass}`).then()
+      // console.log(password, "password submitted is")
+
+      // const isVerified =
+      //   await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyUser/${details.userEmail}/${details.userPass}`).then()
       // console.log(isVerified.data, "API result");
 
-      setIsAuth({ isLoggedIn: true, userID: isVerified.data })
-      const currResponse = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${isVerified.data}`).then()
-      const curr = currResponse.data
-      setCurrUser(curr)
-      setUserType(`${curr.userType}`)
-      console.log(curr.userType, "set user type to");
-      navigate("/")
-      console.log("login SUCCESS");
+      // setIsAuth({ isLoggedIn: true, userID: isVerified.data })
+      // const currResponse = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${isVerified.data}`).then()
+      // const curr = currResponse.data
+      // setCurrUser(curr)
+      // setUserType(`${curr.userType}`)
+      // console.log(curr.userType, "set user type to");
+      // navigate("/")
+      // console.log("login SUCCESS");
 
     } catch (error) {
       console.error(error);

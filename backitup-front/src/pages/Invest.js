@@ -2,8 +2,11 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import '../styles/styles.css'
+import { createClient } from '@supabase/supabase-js'
 
 export default function Invest(props) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   let navigate = useNavigate()
 
@@ -16,10 +19,26 @@ export default function Invest(props) {
   }, [])
 
   const loadUser = async () => {
-    console.log(props.isAuth.userID);
-    const currUser = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${props.isAuth.userID}`)
-    setCurr(currUser.data)
-    console.log("nice you hav eloaded curr user" + currUser.userID);
+    async function fetchUser() {
+      let { data: USER, error } = await supabase
+        .from('USER')
+        .select('*')
+        .eq('USER_ID', props.isAuth.userID)
+        
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setCurr(USER);
+        // console.log(POST);
+      }
+    }
+
+    await fetchUser()
+
+    // console.log(props.isAuth.userID);
+    // const currUser = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${props.isAuth.userID}`)
+    // setCurr(currUser.data)
+    // console.log("nice you hav eloaded curr user" + currUser.userID);
   }
 
   const onInputChange = (event) => {
@@ -29,12 +48,27 @@ export default function Invest(props) {
 
   // Post user investment info to database
   const onSubmit = async (event) => {
+    event.preventDefault()
     // const { userID } = 999;
-
     // console.log(userID, "curr user is (investpg)");
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
-    event.preventDefault()
+    
+    // async function invest() {
+    //   let { data: USER, error } = await supabase
+    //     .from('INVEST')
+    //     .select('*')
+    //     .eq('POST_ID', inv.SHARE_ID)
+    //     // .eq('POST_STATUS', status)
+
+    //   if (error) {
+    //     console.error('Error fetching data:', error);
+    //   } else {
+    //     setInvsPost(POST);
+    //     // console.log(POST);
+    //   }
+    // }
+
     const result =
       await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/invest/${id}/${props.isAuth.userID}/${amt}/${formattedDate}`)
     if (result.data > 0) {

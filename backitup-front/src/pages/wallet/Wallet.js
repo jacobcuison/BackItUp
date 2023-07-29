@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import TopupList from "./TopupList"
 import WithdrawalListUser from "./WithdrawalListUser"
+import { createClient } from '@supabase/supabase-js'
 
 export default function Wallet({ currUser }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   // Initialise Wallet page to be blank
   const [wallet, setWallet] = useState([])
@@ -30,16 +33,60 @@ export default function Wallet({ currUser }) {
     loadWallet()
   }, []);
 
-  // Get Post details from database
+  // Get Wallet details from database
   const loadWallet = async () => {
-    const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${currUser.userID}/wallet`) // change the link as necessary
-    setWallet(result.data)
 
-    const result2 = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listTopUp/${id}`)
-    setTopups(result2.data)
+    async function fetchWallet() {
+      let { data: WALLET, error } = await supabase
+        .from('WALLET_ID')
+        .select('*')
+        .eq('USER_ID', currUser.USER_ID)
 
-    const result3 = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listWithdrawal/${id}`)
-    setWds(result3.data)
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setWallet(WALLET);
+      }
+    }
+
+    async function fetchTopup() {
+      let { data: USER, error } = await supabase
+        .from('TOPUP')
+        .select('*')
+        .eq('WALLET_ID', id)
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setTopups(USER);
+      }
+    }
+
+    async function fetchWithdrawal() {
+      let { data: USER, error } = await supabase
+        .from('WITHDRAWAL')
+        .select('*')
+        .eq('WALLET_ID', id)
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setWds(USER);
+      }
+    }
+
+    await fetchWallet();
+    await fetchTopup();
+    await fetchWithdrawal();
+
+    // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${currUser.userID}/wallet`) // change the link as necessary
+    // setWallet(result.data)
+
+    // const result2 = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listTopUp/${id}`)
+    // setTopups(result2.data)
+
+    // const result3 = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listWithdrawal/${id}`)
+    // setWds(result3.data)
 
   }
 
@@ -53,7 +100,7 @@ export default function Wallet({ currUser }) {
 
             <div className="col-md-9">
 
-              <h3>Active Balance: ${wallet.activeBalance}</h3>
+              <h3>Active Balance: ${wallet.ACTIVE_BALANCE}</h3>
             </div>
             <div className='col-md-3'>
               <Link className="btn btn-solid-dark m-2" to="/topup">
@@ -80,8 +127,8 @@ export default function Wallet({ currUser }) {
           </div>
           {
             displayA
-              ? <TopupList wallet={currUser.wallet} />
-              : <WithdrawalListUser wallet={currUser.wallet} />
+              ? <TopupList wallet={currUser.WALLET} />
+              : <WithdrawalListUser wallet={currUser.WALLET} />
           }
         </div>
       </div>

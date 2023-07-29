@@ -7,6 +7,7 @@ import pwHide from '../images/pw-hide.jpg'
 import logoWords from "../images/logo-words.png"
 import AddUserAuth from "./auth/AddUserAuth"
 import jwt_decode from "jwt-decode";
+import { createClient } from '@supabase/supabase-js'
 
 import "../styles/styles.css"
 
@@ -187,6 +188,8 @@ const Step2 = ({ onPrevious, onSubmit, user, handleChange }) => {
 
 export default function AddUser({ setPageTitle, setUserType }) {
 
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
+
   let navigate = useNavigate()
 
   useEffect(() => {
@@ -225,27 +228,73 @@ export default function AddUser({ setPageTitle, setUserType }) {
   const onSubmit = async (event) => {
     event.preventDefault()
     try {
-      const data = {
-        userName: user.userName,
-        userEmail: user.userEmail,
-        userHP: user.userHP,
-        userPass: user.userPass,
-        userType: user.userType,
-        userEvidence: user.userEvidence,
-        userOauthType: user.userOauthType,
-        userOauthIdentifier: user.userOauthIdentifier
-      };
+      async function createUser() {
+        async function countUsers() {
+          let { data: USER, error } = await supabase
+            .from('USER')
+            .select('*')
+            // .eq('POST_STATUS', status)
+    
+          if (error) {
+            console.error('Error fetching data:', error);
+          } else {
+            return USER.length
+            console.log(POST);
+          }
+        }
 
-      console.log(data)
+        let count = await countUsers()
+        
+        const { data, error } = await supabase
+          .from('USER')
+          .insert([
+            {
+              USER_NAME: user.userName,
+              USER_EMAIL: user.userEmail,
+              USER_HP: user.userHP,
+              USER_PASS: user.userPass,
+              USER_TYPE: user.userType,
+              USER_VERIFIED: 0,
+              USER_LINKEDINLINK: '',
+              USER_SHOWCONTACT: true,
+              USER_OAUTHTYPE: user.userOauthType,
+              USER_OAUTHIDENTIFIER: user.userOauthIdentifier,
+              USER_EVIDENCE: user.userEvidence,
+              USER_PHOTOURL: '',
+              WALLET_ID: count,
+            },
+          ])
+          .select()
 
-      // Create a user with the created wallet.java
-      const response = await axios.post('https://orbital-1690146023037.azurewebsites.net/api/createUserbyAuth', data, {
-        headers: {
-          'Content-Type': 'application/json'
+        if (error) {
+          alert("The email address you entered already has an associated BackItUp account.")
+        } else {
+          navigate("/adduser/thanks")
         }
       }
-      );
-      navigate("/adduser/thanks")
+
+      await createUser()
+      // const data = {
+      //   userName: user.userName,
+      //   userEmail: user.userEmail,
+      //   userHP: user.userHP,
+      //   userPass: user.userPass,
+      //   userType: user.userType,
+      //   userEvidence: user.userEvidence,
+      //   userOauthType: user.userOauthType,
+      //   userOauthIdentifier: user.userOauthIdentifier
+      // };
+
+      // console.log(data)
+
+      // Create a user with the created wallet.java
+      // const response = await axios.post('https://orbital-1690146023037.azurewebsites.net/api/createUserbyAuth', data, {
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // }
+      // );
+      // navigate("/adduser/thanks")
     } catch (error) {
       alert("The email address you entered already has an associated BackItUp account.")
       console.error(error);

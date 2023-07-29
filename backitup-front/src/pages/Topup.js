@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Oops from './Oops.js'
 import qr from '../paynow.jpg'
+import { createClient } from '@supabase/supabase-js'
 
 export default function Topup({ currUser, isAuth, setPageTitle }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   let navigate = useNavigate()
 
@@ -33,30 +36,60 @@ export default function Topup({ currUser, isAuth, setPageTitle }) {
 
       const date = new Date();
       const formattedDate = date.toISOString().substr(0, 19);
-      const data = {
-        walletID: currUser.wallet.wallet_ID,
-        topupAmount: parseFloat(topupAmount),
-        topupPaynow: parseInt(topupPaynow, 10),
-        topupDT: formattedDate,
-        topupVerified: 0, // is this 0 or 1
-        topupEvidence: topupEvidence
-      };
 
-      if (topupAmount <= 0) {
-        throw new Error()
+      async function topup() {
+        const { data, error } = await supabase
+          .from('TOPUP')
+          .insert([
+            {
+              TOPUP_AMOUNT: parseFloat(topupAmount),
+              TOPUP_PAYNOW: parseInt(topupPaynow, 10),
+              TOPUP_DT: formattedDate,
+              TOPUP_VERIFIED: 0,
+              TOPUP_EVIDENCE: topupEvidence,
+              WALLET_ID: currUser.wallet.WALLET_ID,
+            },
+          ])
+          .select()
+
+        if (topupAmount <= 0) {
+          throw new Error()
+        }
+
+        if (error) {
+          alert("Please ensure you entered valid positive numbers.")
+        } else {
+          navigate("/topup/thanks")
+          // console.log(POST);
+        }
+
       }
 
-      // Create a user with the created wallet.java
-      const response = await axios.post('https://orbital-1690146023037.azurewebsites.net/api/topup', data, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      await topup()
+      // const data = {
+      //   walletID: currUser.wallet.wallet_ID,
+      //   topupAmount: parseFloat(topupAmount),
+      //   topupPaynow: parseInt(topupPaynow, 10),
+      //   topupDT: formattedDate,
+      //   topupVerified: 0, // is this 0 or 1
+      //   topupEvidence: topupEvidence
+      // };
 
-      console.log(response.data);
-      console.log("congrats topup success");
+      // if (topupAmount <= 0) {
+      //   throw new Error()
+      // }
 
-      navigate("/topup/thanks")
+      // // Create a user with the created wallet.java
+      // const response = await axios.post('https://orbital-1690146023037.azurewebsites.net/api/topup', data, {
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // });
+
+      // console.log(response.data);
+      // console.log("congrats topup success");
+
+      // navigate("/topup/thanks")
     } catch (error) {
       console.log("topup error")
       alert("Please ensure you entered valid positive numbers.")

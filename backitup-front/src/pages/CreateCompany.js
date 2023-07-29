@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom'
 
 import pwShow from '../images/pw-show.png'
 import pwHide from '../images/pw-hide.png'
+import { createClient } from '@supabase/supabase-js'
 
 export default function CreateCompany({ currUser }) {
+
+  const supabase = createClient('https://pasumucntlfumydvqaaz.supabase.co/', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhc3VtdWNudGxmdW15ZHZxYWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTA0MzgzMjksImV4cCI6MjAwNjAxNDMyOX0.Y53cKpEG3VlX2wTEiG6HM7nvHP-8CFIM7n-NxRF5QAU')
 
   let navigate = useNavigate()
 
@@ -37,29 +40,62 @@ export default function CreateCompany({ currUser }) {
   const onSubmit = async (event) => {
     event.preventDefault()
     try {
-      const data = {
-        userName: name,
-        userEmail: email,
-        userHP: hp,
-        userPass: password,
-        userType: "Company",
-        userEvidence: evidence,
-        userLinkedInLink: "",
-        userShowContact: true
-      };
+      async function insertData() {
+        const { data, error } = await supabase
+          .from('USER')
+          .insert([
+            {
+              USER_NAME: name,
+              USER_EMAIL: email,
+              USER_HP: hp,
+              USER_PASS: password,
+              USER_TYPE: 'COMPANY',
+              USER_VERIFIED: 0,
+              USER_LINKEDINLINK: '',
+              USER_SHOWCONTACT: true,
+              USER_OAUTHTYPE: 'USER',
+              USER_OAUTHIDENTIFIER: '',
+              USER_EVIDENCE: '',
+              USER_PHOTOURL: '',
+              WALLET_ID: currUser.WALLET.WALLET_ID,
+            },
+          ])
+          .select()
 
-      console.log(data)
+        if (error) {
 
-      // Create a user with the created wallet.java
-      const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/createCompany/${currUser.userID}`, data, {
-        headers: {
-          'Content-Type': 'application/json'
+          alert("Error occured. Please try again.")
+          console.error('Error inserting data:', error);
+        } else {
+          navigate("/createcompany/thanks")
+          // console.log(POST);
         }
       }
 
-      );
-      console.log(response.data);
-      navigate("/createcompany/thanks")
+      await insertData()
+
+      // const data = {
+      //   userName: name,
+      //   userEmail: email,
+      //   userHP: hp,
+      //   userPass: password,
+      //   userType: "Company",
+      //   userEvidence: evidence,
+      //   userLinkedInLink: "",
+      //   userShowContact: true
+      // };
+
+      // console.log(data)
+
+      // Create a user with the created wallet.java
+      // const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/createCompany/${currUser.userID}`, data, {
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // }
+
+      // );
+      // console.log(response.data);
 
     } catch (error) {
       alert("Error occured. Please try again.")
@@ -98,8 +134,8 @@ export default function CreateCompany({ currUser }) {
               <input
                 required type={"text"}
                 className="form-control"
-                placeholder={currUser.userName}
-                value={currUser.userName}
+                placeholder={currUser.USER_NAME}
+                value={currUser.USER_NAME}
                 name="founder"
                 disabled
               />
