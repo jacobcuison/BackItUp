@@ -80,10 +80,10 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
   const postsToShow = (showAll === '') && !esg
     ? posts
     : showAll === ''
-      ? posts.filter(post => post.postSustainable)
+      ? posts.filter(post => post.POST_SUSTAINABLE)
       : esg
-        ? posts.filter(post => post.postTitle.toLowerCase().includes(showAll)).filter(post => post.postSustainable)
-        : posts.filter(post => post.postTitle.toLowerCase().includes(showAll))
+        ? posts.filter(post => post.POST_TITLE.toLowerCase().includes(showAll)).filter(post => post.POST_SUSTAINABLE)
+        : posts.filter(post => post.POST_TITLE.toLowerCase().includes(showAll))
 
   return (
     <div className='container-fluid'>

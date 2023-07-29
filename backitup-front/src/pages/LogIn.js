@@ -107,8 +107,11 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
         if (error) {
           alert('You have input an incorrect email/password. Please refresh and try again.')
         } else {
-          setIsAuth({ isLoggedIn: true, userID: USER })
-          await fetchUser(USER).then(navigate('/'))
+          setIsAuth({ isLoggedIn: true, userID: USER.USER_ID })
+          setCurrUser(USER)
+          setUserType(`${USER.USER_TYPE}`)
+          navigate('/')
+          // await fetchUser(USER).then(navigate('/'))
         }
       }
 
