@@ -14,6 +14,7 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
   // Initialise Post page to be blank
   const [loading, setLoading] = useState(true)
   const [post, setPost] = useState([])
+  const [creator, setCreator] = useState([])
   const [share, setShare] = useState([])
   const { id } = useParams()
 
@@ -34,10 +35,24 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
           console.error('Error fetching data:', error);
         } else {
           setPost(POST);
-          setShare(POST.SHARE_COUNT_CURENT * 100 / POST.SHARE_COUNT_TOTAL)
-          setPageTitle(`${POST.POST_TITLE} • BackItUp`)
+          // setShare(post.SHARE_COUNT_CURENT * 100 / post.SHARE_COUNT_TOTAL)
+          setPageTitle(`${post.POST_TITLE} • BackItUp`)
+
+          let { data: USER, error } = await supabase
+            .from('USER')
+            .select('*')
+            .eq('USER_ID', post.USER_ID)
+          if (error) {
+            console.log('Error fetching creator data: ', error);
+          } else {
+            setCreator(USER)
+          }
+
           setLoading(false)
           console.log("post data is: ", POST);
+
+
+
         }
       }
 
@@ -100,14 +115,14 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
             <div className="col-md-3 offset-md-1">
               <div style={{ textAlign: "left" }}>
                 <p><strong>A PROUD PROJECT BY</strong></p>
-                <h3>{post.USER_NAME}</h3>
-                <p><strong>SHARE PRICE</strong></p>
+                <h3>{creator.USER_NAME}</h3>
+                {/* <p><strong>SHARE PRICE</strong></p>
                 <h3>{post.SHARE_COUNT_PRICE}</h3>
 
                 <p><strong>REMAINING SHARES</strong></p>
                 <h3>{post.REMAINING_SHARE}</h3>
                 <p><strong>MINIMUM SHARE PURCHASE</strong></p>
-                <h3>{post.SHARE_COUNT_MIN}</h3>
+                <h3>{post.SHARE_COUNT_MIN}</h3> */}
               </div>
 
               <Link
@@ -118,17 +133,17 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
               </Link>
               <hr />
               <div style={{ textAlign: "left" }}>
-                {post.USER_SHOWCONTACT
+                {creator.USER_SHOWCONTACT
                   ? <div>
                     <p><strong>CONTACT</strong></p>
 
-                    <a className="contact-icon" href={`mailto:${post.USER_EMAIL}`}>
+                    <a className="contact-icon" href={`mailto:${creator.USER_EMAIL}`}>
                       <FontAwesomeIcon icon={faEnvelope} />
                     </a>
-                    <a className="contact-icon" href={`tel:${post.USER_HP}`}>
+                    <a className="contact-icon" href={`tel:${creator.USER_HP}`}>
                       <FontAwesomeIcon icon={faMobile} />
                     </a>
-                    <a className="contact-icon" href={post.USER_LINKEDINLINK} target='_blank'>
+                    <a className="contact-icon" href={creator.USER_LINKEDINLINK} target='_blank'>
                       <FontAwesomeIcon icon={faGlobe} />
                     </a>
                   </div>
