@@ -37,7 +37,7 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
           setShare(POST.SHARE_COUNT_CURENT * 100 / POST.SHARE_COUNT_TOTAL)
           setPageTitle(`${POST.POST_TITLE} • BackItUp`)
           setLoading(false)
-          // console.log(POST);
+          console.log("post data is: ", POST);
         }
       }
 
@@ -118,17 +118,17 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
               </Link>
               <hr />
               <div style={{ textAlign: "left" }}>
-                {post.user.USER_SHOWCONTACT
+                {post.USER_SHOWCONTACT
                   ? <div>
                     <p><strong>CONTACT</strong></p>
 
-                    <a className="contact-icon" href={`mailto:${post.user.USER_EMAIL}`}>
+                    <a className="contact-icon" href={`mailto:${post.USER_EMAIL}`}>
                       <FontAwesomeIcon icon={faEnvelope} />
                     </a>
-                    <a className="contact-icon" href={`tel:${post.user.USER_HP}`}>
+                    <a className="contact-icon" href={`tel:${post.USER_HP}`}>
                       <FontAwesomeIcon icon={faMobile} />
                     </a>
-                    <a className="contact-icon" href={post.user.USER_LINKEDINLINK} target='_blank'>
+                    <a className="contact-icon" href={post.USER_LINKEDINLINK} target='_blank'>
                       <FontAwesomeIcon icon={faGlobe} />
                     </a>
                   </div>
