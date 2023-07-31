@@ -26,30 +26,35 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
   const loadPost = async () => {
     try {
       async function fetchPost() {
-        let { data: POST, error } = await supabase
-          .from('POST')
-          .select('*')
-          .eq('POST_ID', id)
+        // let { data: POST, error } = await supabase
+        //   .from('POST')
+        //   .select('*')
+        //   .eq('POST_ID', id)
+
+        let { data: POST_WITH_SHARE, error } = await supabase
+        .from('POST')
+        .select('*, SHARE(*)')
+        .eq('SHARE_ID', id);
 
         if (error) {
           console.error('Error fetching data:', error);
         } else {
-          setPost(POST);
+          setPost(POST_WITH_SHARE);
           // setShare(post.SHARE_COUNT_CURENT * 100 / post.SHARE_COUNT_TOTAL)
           setPageTitle(`${post.POST_TITLE} • BackItUp`)
 
-          let { data: USER, error } = await supabase
-            .from('USER')
-            .select('*')
-            .eq('USER_ID', post.USER_ID)
-          if (error) {
-            console.log('Error fetching creator data: ', error);
-          } else {
-            setCreator(USER)
-          }
+          // let { data: USER, error } = await supabase
+          //   .from('USER')
+          //   .select('*')
+          //   .eq('USER_ID', post.USER_ID)
+          // if (error) {
+          //   console.log('Error fetching creator data: ', error);
+          // } else {
+          //   setCreator(USER)
+          // }
 
           setLoading(false)
-          console.log("post data is: ", POST);
+          console.log("post data is: ", post);
 
 
 
