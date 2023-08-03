@@ -88,7 +88,7 @@ function App() {
           <Route path="/admin/auth" element={<Admin setUserType={setUserType} />} />
 
           {/* Private routes */}
-          <Route path="/invest/:id" element={<Invest isAuth={isAuth} />} />
+          <Route path="/invest/:id" element={<Invest isAuth={isAuth} currUser={currUser} />} />
           <Route path="/topup" element={<Topup currUser={currUser} isAuth={isAuth} setPageTitle={setPageTitle} />} />
           <Route path="/withdraw" element={<Withdraw currUser={currUser} isAuth={isAuth} setPageTitle={setPageTitle} />} />
 
