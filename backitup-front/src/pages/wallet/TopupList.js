@@ -10,10 +10,11 @@ export default function TopupList({ wallet }) {
 
   // Initialise homepage to be blank
   const [topups, setTopups] = useState([])
-  const [loading, setLoading] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadTopups()
+    console.log('wallet in topuplist', wallet);
   }, []);
 
   // Get list of users from database
@@ -22,24 +23,24 @@ export default function TopupList({ wallet }) {
       let { data: USER, error } = await supabase
         .from('TOPUP')
         .select('*')
-        .eq('WALLET_ID', wallet.WALLET_ID) 
+        .eq('WALLET_ID', wallet) 
 
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setTopups(USER);
+        console.log('data received is ', USER);
+        setTopups(USER[0]);
         // console.log(POST);
       }
     }
 
-    await fetchData();
+    await fetchData()
+    setLoading(false)
 
     // console.log("my wallet", wallet);
     // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listTopUp/${wallet.wallet_ID}`)
     // setTopups(result.data)
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000)
+    
   }
 
   return (
@@ -56,7 +57,9 @@ export default function TopupList({ wallet }) {
               </tr>
             </thead>
             <tbody>
-              {
+              { topups === undefined
+                ? ""
+                :
                 topups.map((topup, index) => (
                   <tr>
                     <th scope="row" key="index">{index + 1}</th>

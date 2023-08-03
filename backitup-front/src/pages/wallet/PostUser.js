@@ -14,7 +14,7 @@ export default function PostUser({ currUser }) {
   }, []);
 
   const loadPosts = async () => {
-
+    
     async function fetchData() {
       let { data: POST, error } = await supabase
         .from('POST')

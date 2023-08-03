@@ -14,8 +14,8 @@ export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
   // const [isCompany, setIsCompany] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
 
-  console.log(isAuth.isLoggedIn, "status of log in");
-  console.log(currUser.userID, "userID is current");
+  // console.log(isAuth.isLoggedIn, "status of log in");
+  // console.log(currUser.userID, "userID is current");
 
   useEffect(() => {
     loadData()
@@ -25,10 +25,10 @@ export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
   const loadData = async () => {
 
     // async function fetchData() {
-    //   let { data: POST, error } = await supabase
+    //   let { data: USER, error } = await supabase
     //     .from('USER')
     //     .select('*')
-    //     .eq('USER_EMAIL', EMAIL)
+    //     .eq('USER_ID', currUser.USER_ID)
     //     .eq('USER_PASSWORD', Password)
 
     //   if (error) {
@@ -118,18 +118,18 @@ export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
                     title="Settings"
                     className="flex-column">
                     <div className="dropdown-links-container">
-                      <Link className='dropdown-link mx-2' to={"/profile/" + currUser.userID}>
+                      <Link className='dropdown-link mx-2' to={"/profile/" + currUser.USER_ID}>
                         My Profile
                       </Link>
-                      {currUser.userType == "Investor"
+                      {currUser.USER_TYPE == "Investor"
                         ? <></>
-                        : currUser.userType == "Founder" // has to be founder
-                          ? currUser.userVerified === 1
+                        : currUser.USER_TYPE == "Founder" // has to be founder
+                          ? currUser.USER_VERIFIED === 1
                             ? <Link className="dropdown-link mx-2" to="/createcompany">
                               Create Company
                             </Link>
                             : <></>
-                          : currUser.userVerified === 1
+                          : currUser.USER_VERIFIED === 1
                             ? <Link className="dropdown-link mx-2" to="/create">
                               Create Post
                             </Link>

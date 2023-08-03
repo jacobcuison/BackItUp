@@ -41,7 +41,7 @@ export default function ViewUser({ currUser }) {
 
   const handleChange = (event) => {
     setUser({ ...user, [event.target.name]: event.target.value });
-    console.log(user);
+    console.log('updating: ', user);
   }
 
   const handleTogglePassword = (e) => {
@@ -70,27 +70,29 @@ export default function ViewUser({ currUser }) {
       async function updateUser() {
         const { data, error } = await supabase
           .from('USER')
-          .update({ USER_NAME: user.userName })
-          .update({ USER_EMAIL: user.userEmail })
-          .update({ USER_HP: user.userHP })
-          .update({ USER_PASS: user.userPass })
-          .update({ USER_TYPE: user.userType })
-          .update({ USER_EVIDENCE: user.userEvidence })
-          .update({ USER_LINKEDINLINK: user.userLinkedinLink })
-          .update({ USER_SHOWCONTACT: user.userShowContact })
-          .update({ USER_PHOTOURL: user.userPhotoURL})
+          .update({
+            USER_NAME: user.userName,
+            USER_EMAIL: user.userEmail,
+            USER_HP: user.userHP,
+            USER_PASS: user.userPass,
+            USER_TYPE: user.userType,
+            USER_EVIDENCE: user.userEvidence,
+            USER_LINKEDINLINK: user.userLinkedinLink,
+            USER_SHOWCONTACT: user.userShowContact,
+            USER_PHOTOURL: user.userPhotoURL
+          })
           .eq('USER_ID', currUser.USER_ID)
           .select()
 
         if (error) {
           console.log(error);
         } else {
-
+          console.log('successful update', data);
         }
 
       }
 
-      await updateUser().then(setIsEdit(!isEdit))
+      await updateUser()
 
       // // Create a user with the created wallet.java
       // const response = await axios.post(`https://orbital-1690146023037.azurewebsites.net/api/editUser/${currUser.userID}`, user, {
@@ -105,6 +107,8 @@ export default function ViewUser({ currUser }) {
     } catch (error) {
       console.error(error);
       console.log("Edit User failed")
+    } finally {
+      setIsEdit(!isEdit)
     }
 
     // try {
@@ -219,10 +223,11 @@ export default function ViewUser({ currUser }) {
                 Profile Photo
               </label>
               <input
-                type={"file"}
+                type={"text"}
                 className="form-control"
-                name="Photo"
-                onChange={(event) => handleFileChange(event)}
+                name="userPhotoURL"
+                value={user.userPhotoURL}
+                onChange={(event) => handleChange(event)}
                 disabled={!isEdit}
               />
               <small id="evidenceHelp" class="form-text text-muted">Please choose a square image.</small>
@@ -249,10 +254,11 @@ export default function ViewUser({ currUser }) {
                 Documents
               </label>
               <input
-                type={"file"}
+                type={"text"}
                 className="form-control"
-                name="evidence"
-                onChange={(event) => handleEvidenceChange(event)}
+                name="userEvidence"
+                value={user.userEvidence}
+                onChange={(event) => handleChange(event)}
                 disabled={!isEdit}
               />
 

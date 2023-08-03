@@ -22,12 +22,12 @@ export default function WithdrawalListUser({wallet}) {
         let { data: USER, error } = await supabase
           .from('WITHDRAWAL')
           .select('*')
-          .eq('WALLET_ID', wallet.WALLET_ID)
+          .eq('WALLET_ID', wallet)
   
         if (error) {
           console.error('Error fetching data:', error);
         } else {
-          setWds(USER);
+          setWds(USER[0]);
         }
       }
   
@@ -52,7 +52,7 @@ export default function WithdrawalListUser({wallet}) {
                     </tr>
                 </thead>
                 <tbody>
-                {
+                { wds == undefined ? '' :
                         wds.map((wd, index) => (
                             <tr>
                             <th scope="row" key="index">{index + 1}</th>

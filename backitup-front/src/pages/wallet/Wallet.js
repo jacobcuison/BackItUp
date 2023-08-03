@@ -31,6 +31,7 @@ export default function Wallet({ currUser }) {
 
   useEffect(() => {
     loadWallet()
+    console.log('curruser is: ', currUser);
   }, []);
 
   // Get Wallet details from database
@@ -38,18 +39,20 @@ export default function Wallet({ currUser }) {
 
     async function fetchWallet() {
       let { data: WALLET, error } = await supabase
-        .from('WALLET_ID')
+        .from('WALLET')
         .select('*')
-        .eq('USER_ID', currUser.USER_ID)
+        .eq('WALLET_ID', currUser.WALLET_ID)
 
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setWallet(WALLET);
+        setWallet(WALLET[0]);
+        console.log('my wallet render is: ', WALLET);
       }
     }
 
     async function fetchTopup() {
+      console.log('fetching topup from this wallet, ', wallet);
       let { data: USER, error } = await supabase
         .from('TOPUP')
         .select('*')
@@ -58,7 +61,7 @@ export default function Wallet({ currUser }) {
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setTopups(USER);
+        setTopups(USER[0]);
       }
     }
 
@@ -71,13 +74,15 @@ export default function Wallet({ currUser }) {
       if (error) {
         console.error('Error fetching data:', error);
       } else {
-        setWds(USER);
+        setWds(USER[0]);
       }
     }
 
-    await fetchWallet();
-    await fetchTopup();
-    await fetchWithdrawal();
+    await fetchWallet()
+    // .then(async () =>
+
+    //   await fetchTopup()).then(async () => await fetchWithdrawal())
+
 
     // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${currUser.userID}/wallet`) // change the link as necessary
     // setWallet(result.data)
@@ -127,8 +132,8 @@ export default function Wallet({ currUser }) {
           </div>
           {
             displayA
-              ? <TopupList wallet={currUser.WALLET} />
-              : <WithdrawalListUser wallet={currUser.WALLET} />
+              ? <TopupList wallet={currUser.WALLET_ID} />
+              : <WithdrawalListUser wallet={currUser.WALLET_ID} />
           }
         </div>
       </div>

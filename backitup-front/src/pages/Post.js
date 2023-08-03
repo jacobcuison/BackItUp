@@ -13,62 +13,81 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
 
   // Initialise Post page to be blank
   const [loading, setLoading] = useState(true)
-  const [post, setPost] = useState([])
+  const [post, setPost] = useState(null)
   const [creator, setCreator] = useState([])
-  const [share, setShare] = useState([])
+  const [share, setShare] = useState(null)
   const { id } = useParams()
 
   useEffect(() => {
     loadPost()
   }, []);
 
+  useEffect(() => {
+    // This effect will run whenever the post state changes
+    if (post) {
+      loadCreator()
+      setPageTitle(`${post.POST_TITLE} • BackItUp`);
+      setShare(post.SHARE.SHARE_COUNT_CURRENT * 100 / post.SHARE.SHARE_COUNT_TOTAL);
+      console.log(post.SHARE.SHARE_COUNT_CURRENT);
+      console.log(post);
+      console.log("share data is: ", post.SHARE.SHARE_COUNT_CURRENT * 100 / post.SHARE.SHARE_COUNT_TOTAL);
+      setLoading(false);
+    }
+  }, [post]);
+
+
   // Get Post details from database
   const loadPost = async () => {
     try {
       async function fetchPost() {
-        // let { data: POST, error } = await supabase
-        //   .from('POST')
-        //   .select('*')
-        //   .eq('POST_ID', id)
-
         let { data: POST_WITH_SHARE, error } = await supabase
-        .from('POST')
-        .select('*, SHARE(*)')
-        .eq('SHARE_ID', id);
+          .from('POST')
+          .select('*, SHARE(*)')
+          .eq('POST_ID', id);
 
         if (error) {
           console.error('Error fetching data:', error);
         } else {
-          setPost(POST_WITH_SHARE);
-          // setShare(post.SHARE_COUNT_CURENT * 100 / post.SHARE_COUNT_TOTAL)
-          setPageTitle(`${post.POST_TITLE} • BackItUp`)
-
-          // let { data: USER, error } = await supabase
-          //   .from('USER')
-          //   .select('*')
-          //   .eq('USER_ID', post.USER_ID)
-          // if (error) {
-          //   console.log('Error fetching creator data: ', error);
-          // } else {
-          //   setCreator(USER)
-          // }
-
-          setLoading(false)
-          console.log("post data is: ", post);
-
-
-
+          return POST_WITH_SHARE[0]
         }
       }
 
-      await fetchPost()
+      const result = await fetchPost().then()
+      setPost(result)
+
+      
+      // AXIOS CODE
       // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/${id}`) // change the link as necessary
       // setPost(result.data);
       // setShare((result.data.share.shareCountCurrent * 100) / result.data.share.shareCountTotal);
       // setPageTitle(`${result.data.postTitle} • BackItUp`);
       // setLoading(false)
     } catch (error) {
-      // console.log(error);
+      setLoading(false)
+      console.log(error);
+    }
+  }
+
+  const loadCreator = async () => {
+    try {
+      async function fetchCreator() {
+        let { data: USER, error } = await supabase
+          .from('USER')
+          .select('*')
+          .eq('USER_ID', post.USER_ID)
+
+        if (error) {
+          console.error('Error fetching data:', error);
+        } else {
+          return USER[0]
+        }
+      }
+
+      const result2 = await fetchCreator()
+      console.log(result2);
+      setCreator(result2)
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -121,13 +140,13 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
               <div style={{ textAlign: "left" }}>
                 <p><strong>A PROUD PROJECT BY</strong></p>
                 <h3>{creator.USER_NAME}</h3>
-                {/* <p><strong>SHARE PRICE</strong></p>
-                <h3>{post.SHARE_COUNT_PRICE}</h3>
+                <p><strong>SHARE PRICE</strong></p>
+                <h3>{post.SHARE.SHARE_COUNT_PRICE}</h3>
 
                 <p><strong>REMAINING SHARES</strong></p>
-                <h3>{post.REMAINING_SHARE}</h3>
+                <h3>{post.SHARE.SHARE_COUNT_TOTAL - post.SHARE.SHARE_COUNT_CURRENT}</h3>
                 <p><strong>MINIMUM SHARE PURCHASE</strong></p>
-                <h3>{post.SHARE_COUNT_MIN}</h3> */}
+                <h3>{post.SHARE.SHARE_COUNT_MIN}</h3>
               </div>
 
               <Link
@@ -139,21 +158,21 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
               <hr />
               <div style={{ textAlign: "left" }}>
                 {creator.USER_SHOWCONTACT
-                  ? <div>
-                    <p><strong>CONTACT</strong></p>
+                ? <div>
+                  <p><strong>CONTACT</strong></p>
 
-                    <a className="contact-icon" href={`mailto:${creator.USER_EMAIL}`}>
-                      <FontAwesomeIcon icon={faEnvelope} />
-                    </a>
-                    <a className="contact-icon" href={`tel:${creator.USER_HP}`}>
-                      <FontAwesomeIcon icon={faMobile} />
-                    </a>
-                    <a className="contact-icon" href={creator.USER_LINKEDINLINK} target='_blank'>
-                      <FontAwesomeIcon icon={faGlobe} />
-                    </a>
-                  </div>
-                  : <></>
-                }
+                  <a className="contact-icon" href={`mailto:${creator.USER_EMAIL}`}>
+                    <FontAwesomeIcon icon={faEnvelope} />
+                  </a>
+                  <a className="contact-icon" href={`tel:${creator.USER_HP}`}>
+                    <FontAwesomeIcon icon={faMobile} />
+                  </a>
+                  <a className="contact-icon" href={creator.USER_LINKEDINLINK} target='_blank'>
+                    <FontAwesomeIcon icon={faGlobe} />
+                  </a>
+                </div>
+                : <></>
+              }
               </div>
             </div>
           </div>

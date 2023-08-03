@@ -228,23 +228,51 @@ export default function AddUser({ setPageTitle, setUserType }) {
   const onSubmit = async (event) => {
     event.preventDefault()
     try {
+      async function checkEmail() {
+        let { data: USER, error } = await supabase
+          .from('USER')
+          // .eq('USER_EMAIL', user.userEmail)
+          .select('*')
+
+        if (error) {
+          // No duplicate
+        } else {
+          const dup = USER.filter((acct) => acct.USER_EMAIL == user.userEmail)
+          if (dup.length > 0) {
+            console.log("boomboombom");
+            throw new Error()
+          }
+        }
+
+      }
+
+      const isDuplicate = await checkEmail()
+
       async function createUser() {
-        async function countUsers() {
-          let { data: USER, error } = await supabase
-            .from('USER')
+        async function createWallet() {
+          const { data, error } = await supabase
+            .from('WALLET')
+            .insert(
+              {
+                ACTIVE_BALANCE: 0,
+                FROZEN_BALANCE: 0,
+              }
+            )
             .select('*')
-            // .eq('POST_STATUS', status)
-    
+
+
           if (error) {
             console.error('Error fetching data:', error);
           } else {
-            return USER.length
+            return data[0]
             // console.log(POST);
           }
         }
 
-        let count = await countUsers()
-        
+        let wallet = await createWallet()
+        console.log("wallet retrieved: ", wallet);
+        console.log("passing in: ", wallet.WALLET_ID)
+
         const { data, error } = await supabase
           .from('USER')
           .insert([
@@ -261,12 +289,13 @@ export default function AddUser({ setPageTitle, setUserType }) {
               USER_OAUTHIDENTIFIER: user.userOauthIdentifier,
               USER_EVIDENCE: user.userEvidence,
               USER_PHOTOURL: '',
-              WALLET_ID: count,
+              WALLET_ID: wallet.WALLET_ID,
             },
           ])
           .select()
 
         if (error) {
+          console.log(error);
           alert("The email address you entered already has an associated BackItUp account.")
         } else {
           navigate("/adduser/thanks")

@@ -46,10 +46,11 @@ export default function PostList() {
     async function fetchData() {
       let { data: POST, error } = await supabase
         .from('POST')
-        .update({ POST_STATUS : 1 })
-        .update({ POST_APPROVED_DT: formattedDate })
+        .update({ POST_STATUS : 1,
+          POST_APPROVED_DT: formattedDate })
         .eq('POST_ID', POST_ID)
         .select()
+       
     
       if (error) {
         console.error('Error fetching data:', error);
@@ -73,10 +74,10 @@ export default function PostList() {
     async function fetchData() {
       let { data: POST, error } = await supabase
         .from('POST')
-        .update({ POST_STATUS : -1 })
-        .update({ POST_APPROVED_DT: formattedDate })
-        .eq('POST_ID', POST_ID)
         .select()
+        .update({ POST_STATUS : -1, POST_APPROVED_DT: formattedDate })
+        .eq('POST_ID', POST_ID)
+        
     
       if (error) {
         console.error('Error fetching data:', error);
@@ -103,6 +104,7 @@ export default function PostList() {
               <th scope="col">Date</th>
               <th scope="col">Post Name</th>
               <th scope="col">Description</th>
+              <th scope="col">pHOTO</th>
               <th scope="col">Pitch Deck</th>
               <th scope="col">Action</th>
               <th scope="col">Verified on</th>
@@ -116,9 +118,10 @@ export default function PostList() {
                   <td>{post.POST_CREATE_DT}</td>
                   <td>{post.POST_TITLE}</td>
                   <td>{post.POST_DESCRIPTION}</td>
+                  <td>{post.POST_PHOTOURL}</td>
                   <td>{post.POST_URL}</td>
                   <td>
-                    {post.PENDING_STATUS
+                    {post.POST_STATUS === 0
                       ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(post.POST_ID)}>Verify</button>
                       : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(post.POST_ID)}>Unverify</button>
                     }

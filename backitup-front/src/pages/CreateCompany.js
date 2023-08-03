@@ -49,7 +49,7 @@ export default function CreateCompany({ currUser }) {
               USER_EMAIL: email,
               USER_HP: hp,
               USER_PASS: password,
-              USER_TYPE: 'COMPANY',
+              USER_TYPE: 'Company',
               USER_VERIFIED: 0,
               USER_LINKEDINLINK: '',
               USER_SHOWCONTACT: true,
@@ -57,7 +57,7 @@ export default function CreateCompany({ currUser }) {
               USER_OAUTHIDENTIFIER: '',
               USER_EVIDENCE: '',
               USER_PHOTOURL: '',
-              WALLET_ID: currUser.WALLET.WALLET_ID,
+              WALLET_ID: currUser.WALLET_ID,
             },
           ])
           .select()
@@ -98,6 +98,7 @@ export default function CreateCompany({ currUser }) {
       // console.log(response.data);
 
     } catch (error) {
+      console.log(error);
       alert("Error occured. Please try again.")
     }
 

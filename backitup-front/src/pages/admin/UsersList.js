@@ -117,7 +117,7 @@ export default function UsersList() {
                         user.USER_VERIFIED ? 'Y' : 'N'
                       }
                     </td>
-                    <td>{user.USER_EVIDENCE == "" ? "" : <a href={`${user.USER_EVIDENCE}`} target="_blank">View</a>}</td>
+                    <td>{user.USER_EVIDENCE == "" || user.USER_EVIDENCE == null ? "" : <a href={`${user.USER_EVIDENCE}`} target="_blank">View</a>}</td>
                     <td>
                       {user.USER_VERIFIED === 0 || user.USER_VERIFIED === -1
                         ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(user.USER_ID)}>Verify</button>

@@ -30,11 +30,11 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
   const [post, setPost] = useState("")
   const { id } = useParams()
 
-  const [postRaiseDate, setPostRaiseDate] = useState(post.postCreateDT);
-  const [postEndDate, setPostEndDate] = useState(post.postExpireDT);
+  const [postRaiseDate, setPostRaiseDate] = useState(post.POST_CREATE_DT);
+  const [postEndDate, setPostEndDate] = useState(post.POST_EXPIRE_DT);
 
-  const { postTitle, postContent, postDescription, postSustainable, postURL,
-    share } = post;
+  // const { postTitle, postContent, postDescription, postSustainable, postURL,
+  //   share } = post;
 
   // const { shareCountTotal, shareCountMin, shareCountCurrent, shareCountPrice } = share
 
@@ -49,12 +49,47 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
   }, [])
 
   const loadPost = async () => {
-    const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/${id}`) // change the link as necessary
-    setPost(result.data)
-    // setShare((post.share.shareCountCurrent) * 100 / post.share.shareCountTotal);
-    console.log(result.data);
-    // console.log(share);
-    setLoading(false)
+    async function fetchData() {
+      try {
+        let { data: POST, error } = await supabase
+          .from('POST')
+          .select('*, SHARE(*)')
+          .eq('POST_ID', id)
+        // .eq('POST_STATUS', status)
+
+        if (error) {
+          console.error('Error fetching data:', error);
+        } else {
+          console.log('setting to: ', POST[0]);
+          setPost(POST[0]);
+          setChecked(POST[0].POST_SUSTAINABLE)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    async function loadData() {
+      try {
+        await fetchData();
+      } catch (error) {
+        console.error('Error setting post:', error);
+      } finally {
+
+        console.log('i set post to: ', post);
+        setLoading(false);
+      }
+    }
+
+    loadData();
+
+
+    // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/${id}`) // change the link as necessary
+    // setPost(result.data)
+    // // setShare((post.share.shareCountCurrent) * 100 / post.share.shareCountTotal);
+    // console.log(result.data);
+    // // console.log(share);
+
   }
 
   const handleCheckChange = (event) => {
@@ -65,7 +100,7 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
     // testing valuation
     // console.log(parseInt(SHARE_COUNT_TOTAL), "total is");
     // console.log(parseFloat(SHARE_COUNT_PRICE), "price is");
-    setValue(parseInt(share.shareCountTotal) * parseFloat(share.shareCountPrice))
+    // setValue(parseInt(share.shareCountTotal) * parseFloat(share.shareCountPrice))
     setPost({ ...post, [event.target.name]: event.target.value });
     // console.log(SHARE_COUNT_TOTAL);
     console.log(post);
@@ -79,63 +114,66 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
       async function updatePost() {
         const { data, error } = await supabase
           .from('POST')
-          .update({ POST_TITLE: postTitle})
-          .update({ POST_DESCRIPTION: postDescription})
-          .update({ POST_CONTENT:  postContent})
-          .update({ POST_URL: postURL})
-          .update({ POST_SUSTAINABLE: checked})
+          .update({
+            POST_TITLE: post.POST_TITLE,
+            POST_DESCRIPTION: post.POST_DESCRIPTION,
+            POST_CONTENT: post.POST_CONTENT,
+            POST_URL: post.POST_URL,
+            POST_SUSTAINABLE: checked,
+            POST_PHOTOURL: post.POST_PHOTOURL
+          })
           .eq('POST_ID', post.POST_ID)
           .select()
-        
-          if (error) {
-            console.error('Error updating data:', error);
-          } else {
-            navigate("/")
-          }
+
+        if (error) {
+          console.error('Error updating data:', error);
+        } else {
+          navigate("/")
+        }
       }
 
       await updatePost()
 
-    //   const apiUrl = `/api/editPost/${post.postID}`;
-    //   const date = new Date();
-    //   // const exp = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000)
-    //   // const formattedExp = exp.toISOString().substr(0, 19)
-    //   const formattedDate = date.toISOString().substr(0, 19);
-    //   const pdata = {
-    //     postTitle: postTitle,
-    //     postDescription: postDescription,
-    //     postContent: postContent,
-    //     postURL: postURL,
-    //     postSustainable: checked,
-    //     // shareCountTotal: parseInt(share.shareCountTotal),
-    //     // shareCountMin: parseInt(share.shareCountMin),
-    //     // shareCountCurrent: share.shareCountCurrent,
-    //     // shareCountPrice: parseFloat(share.shareCountPrice),
-    //     // postStatus: 0,
-    //     // postCreateDT: formattedDate,
-    //     // postRaiseDT: post.postCreateDT,
-    //     postExpireDT: post.postExpireDT,
-    //     // postRaisedDT: postRaiseDate.toISOString().substr(0, 19),
-    //     // postExpireDT: postEndDate.toISOString().substr(0, 19),
-    //     // userID: currUser.userID
-    //   };
+      //   const apiUrl = `/api/editPost/${post.postID}`;
+      //   const date = new Date();
+      //   // const exp = new Date(date.getTime() + 7 * 24 * 60 * 60 * 1000)
+      //   // const formattedExp = exp.toISOString().substr(0, 19)
+      //   const formattedDate = date.toISOString().substr(0, 19);
+      //   const pdata = {
+      //     postTitle: postTitle,
+      //     postDescription: postDescription,
+      //     postContent: postContent,
+      //     postURL: postURL,
+      //     postSustainable: checked,
+      //     // shareCountTotal: parseInt(share.shareCountTotal),
+      //     // shareCountMin: parseInt(share.shareCountMin),
+      //     // shareCountCurrent: share.shareCountCurrent,
+      //     // shareCountPrice: parseFloat(share.shareCountPrice),
+      //     // postStatus: 0,
+      //     // postCreateDT: formattedDate,
+      //     // postRaiseDT: post.postCreateDT,
+      //     postExpireDT: post.postExpireDT,
+      //     // postRaisedDT: postRaiseDate.toISOString().substr(0, 19),
+      //     // postExpireDT: postEndDate.toISOString().substr(0, 19),
+      //     // userID: currUser.userID
+      //   };
 
-    //   console.log(pdata)
+      //   console.log(pdata)
 
-    //   fetch(apiUrl, {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(pdata)
-    //   })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //       // Handle the response data
-    //       console.log(data);
-    //     })
-    //   console.log("post updateeeeee success");
-    //   navigate("/")
+      //   fetch(apiUrl, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     },
+      //     body: JSON.stringify(pdata)
+      //   })
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       // Handle the response data
+      //       console.log(data);
+      //     })
+      //   console.log("post updateeeeee success");
+      //   navigate("/")
 
     } catch (error) {
       console.error(error);
@@ -162,8 +200,8 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                     type={"text"}
                     className="form-control"
                     placeholder="My Title"
-                    name="postTitle"
-                    value={postTitle}
+                    name="POST_TITLE"
+                    value={post.POST_TITLE}
                     onChange={(event) => handleChange(event)}
                   />
                 </div>
@@ -175,7 +213,7 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   className="form-label">
                   Company
                 </label>
-                <input class="form-control" type="text" placeholder={`${post.USER_NAME}`} aria-label="Disabled input example" disabled></input>
+                <input class="form-control" type="text" placeholder={`${currUser.USER_NAME}`} aria-label="Disabled input example" disabled></input>
               </div>
               <div className="row">
                 <div className="col-md-11">
@@ -188,14 +226,14 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                     type={"text"}
                     className="form-control"
                     placeholder="A one-line summary of your project"
-                    name="postDescription"
-                    value={postDescription}
+                    name="POST_DESCRIPTION"
+                    value={post.POST_DESCRIPTION}
                     onChange={(event) => handleChange(event)}
                   />
                 </div>
 
                 <div class="col-md-1 align-self-end">
-                  <input type="checkbox" class="btn-check" id="btn-check" value={postSustainable}
+                  <input type="checkbox" class="btn-check" id="btn-check" value={post.POST_SUSTAINABLE}
                     onChange={(event) => handleCheckChange(event)} autocomplete="off" />
                   <label class={checked ? "btn btn-success" : "btn btn-outline-dark"} for="btn-check">ESG</label>
                 </div>
@@ -210,8 +248,8 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   type={"text"}
                   class="form-control"
                   placeholder="A summary of why your idea will change the world. Possible things to include: goals, user flows, and innovations."
-                  name="postContent"
-                  value={postContent}
+                  name="POST_CONTENT"
+                  value={post.POST_CONTENT}
                   onChange={(event) => handleChange(event)}
                   id="exampleFormControlTextarea1"
                   rows="3"></textarea>
@@ -226,8 +264,8 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   type={"text"}
                   className="form-control"
                   placeholder="Google Drive, Dropbox, etc"
-                  name="postURL"
-                  value={postURL}
+                  name="POST_URL"
+                  value={post.POST_URL}
                   onChange={(event) => handleChange(event)}
                 />
                 <small id="urlHelp" className="form-text text-muted">Please ensure that the link is visible to the public.</small>
@@ -244,8 +282,8 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   disabled type={"text"}
                   className="form-control"
                   placeholder="999"
-                  name="share.shareCountTotal"
-                  value={share.SHARE_COUNT_TOTAL}
+                  name="post.SHARE.SHARE_COUNT_TOTAL"
+                  value={post.SHARE.SHARE_COUNT_TOTAL}
                   onChange={(event) => handleChange(event)}
                 />
               </div>
@@ -263,8 +301,8 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                     disabled type={"text"}
                     className="form-control"
                     placeholder="Round off to the nearest 0.01"
-                    name="share.shareCountPrice"
-                    value={share.SHARE_COUNT_PRICE}
+                    name="post.SHARE.SHARE_COUNT_PRICE"
+                    value={post.SHARE.SHARE_COUNT_PRICE}
                     onChange={(event) => handleChange(event)}
                   />
                 </div>
@@ -279,8 +317,8 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   disabled type={"text"}
                   className="form-control"
                   placeholder="1"
-                  name="share.shareCountMin"
-                  value={share.SHARE_COUNT_MIN}
+                  name="post.SHARE.SHARE_COUNT_MIN"
+                  value={post.SHARE.SHARE_COUNT_MIN}
                   onChange={(event) => handleChange(event)}
                 />
               </div>
@@ -337,7 +375,25 @@ export default function EditPost({ currUser, isAuth, setPageTitle }) {
                   onChange={date => setPostEndDate(date)}
                 />
               </div>
-
+              <div className='col-md-4'>
+                <div className="mb-3">
+                  <label
+                    htmlFor="Pitch"
+                    className="form-label">
+                    Cover Photo
+                  </label>
+                  <input
+                    required type={"text"}
+                    className="form-control"
+                    placeholder="Google Drive, Dropbox, etc"
+                    name="POST_PHOTOURL"
+                    value={post.POST_PHOTOURL}
+                    onChange={(event) => handleChange(event)}
+                  />
+                  <small id="urlHelp"
+                    className="form-text text-muted">Please ensure that the link is visible to the public.</small>
+                </div>
+              </div>
               <button type="submit" className="btn btn-solid-dark">Save Changes</button>
 
             </div>

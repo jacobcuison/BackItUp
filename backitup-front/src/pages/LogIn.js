@@ -44,88 +44,51 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
     console.log(userObject);
     try {
       console.log(userObject.sub);
-      const isVerified =
-        await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyUserbyAuth/${userObject.sub}/GOOGLE`)
-      console.log(isVerified.data, "API result is<<<<<<<<<<<<<<<<<<,");
-      if (parseInt(isVerified.data) >= 0) {
-        setIsAuth({ isLoggedIn: true, userID: isVerified.data })
-        const currResponse = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${isVerified.data}`).then()
-        const curr = currResponse.data
-        setCurrUser(curr)
-        setUserType(`${curr.userType}`)
-        console.log(curr.userType, "set user type to");
-        navigate("/")
-        console.log("login SUCCESS");
-      } else {
-        alert('You do not have a BackItUp account linked to this Google account.')
-      }
-    } catch (error) {
-      alert('You do not have a BackItUp account linked to this Google account. Please sign up!')
-      console.log("gooogle failed");
-    }
-  }
 
-  useEffect(() => {
-    /* global google */
-    google.accounts.id.initialize({
-      client_id: "502112046738-80gbpokjtcn2qqur1su4g69jp28dtvgk.apps.googleusercontent.com",
-      callback: handleCallbackResponse
-    })
-
-    google.accounts.id.renderButton(
-      document.getElementById("signInDiv"),
-      { theme: "outline", size: "large" }
-    )
-  }, [])
-
-  // Post user registration info to database
-  const onSubmit = async (event) => {
-    event.preventDefault()
-    try {
-      async function fetchUser(USER_ID) {
+      async function logInAuth() {
         let { data: USER, error } = await supabase
           .from('USER')
           .select('*')
-          .eq('USER_ID', USER_ID)
+          .eq('USER_OAUTHTYPE', 'GOOGLE')
+          .eq('USER_OAUTHIDENTIFIER', userObject.sub)
 
         if (error) {
-          console.error('Error fetching data:', error);
+          console.log('Error when checking for associated Google details: ', error);
+          alert('You do not have a BackItUp account linked to this Google account.')
+        
         } else {
-          setCurrUser(USER)
-          setUserType(`${USER.USER_TYPE}`)
-          console.log(USER, "result of fetchUser API call");
+          console.log(USER);
+          return USER[0]
         }
+
+        
       }
 
-      await fetchUser()
+      const idAuth = await logInAuth()
+      console.log('IDaUTH IS: ', idAuth);
+
+      // const isVerified =
+      //   await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyUserbyAuth/${userObject.sub}/GOOGLE`)
+      // console.log(isVerified.data, "API result is<<<<<<<<<<<<<<<<<<,");
+
       async function logIn() {
         let { data: USER, error } = await supabase
           .from('USER')
           .select('*')
-          .eq('USER_EMAIL', email)
-          .eq('USER_PASS', password)
+          .eq('USER_ID', idAuth.USER_ID)
+
         if (error) {
           alert('You have input an incorrect email/password. Please refresh and try again.')
         } else {
-          setIsAuth({ isLoggedIn: true, userID: USER.USER_ID })
-          setCurrUser(USER)
-          setUserType(`${USER.USER_TYPE}`)
+          setIsAuth({ isLoggedIn: true, userID: idAuth.USER_ID })
+          setCurrUser(USER[0])
+          setUserType(`${USER[0].USER_TYPE}`)
           navigate('/')
-          // await fetchUser(USER).then(navigate('/'))
         }
       }
 
+
       await logIn()
-      // const details = {
-      //   userEmail: email,
-      //   userPass: password
-      // }
-
-      // console.log(password, "password submitted is")
-
-      // const isVerified =
-      //   await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyUser/${details.userEmail}/${details.userPass}`).then()
-      // console.log(isVerified.data, "API result");
 
       // setIsAuth({ isLoggedIn: true, userID: isVerified.data })
       // const currResponse = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${isVerified.data}`).then()
@@ -135,68 +98,145 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
       // console.log(curr.userType, "set user type to");
       // navigate("/")
       // console.log("login SUCCESS");
+    
+  } catch (error) {
+    alert('You do not have a BackItUp account linked to this Google account. Please sign up!')
+    console.log("gooogle failed", error);
+  }
+}
 
-    } catch (error) {
-      console.error(error);
-      console.log("diu")
-      window.alert('You have input an incorrect email/password. Please refresh and resubmit the form.')
+useEffect(() => {
+  /* global google */
+  google.accounts.id.initialize({
+    client_id: "502112046738-80gbpokjtcn2qqur1su4g69jp28dtvgk.apps.googleusercontent.com",
+    callback: handleCallbackResponse
+  })
+
+  google.accounts.id.renderButton(
+    document.getElementById("signInDiv"),
+    { theme: "outline", size: "large" }
+  )
+}, [])
+
+// Post user registration info to database
+const onSubmit = async (event) => {
+  event.preventDefault()
+  try {
+    async function fetchUser(USER_ID) {
+      let { data: USER, error } = await supabase
+        .from('USER')
+        .select('*')
+        .eq('USER_ID', USER_ID)
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setCurrUser(USER[0])
+        setUserType(`${USER[0].USER_TYPE}`)
+        console.log(USER, "result of fetchUser API call");
+      }
     }
 
-  };
+    await fetchUser()
+    async function logIn() {
+      let { data: USER, error } = await supabase
+        .from('USER')
+        .select('*')
+        .eq('USER_EMAIL', email)
+        .eq('USER_PASS', password)
+      if (error) {
+        alert('You have input an incorrect email/password. Please refresh and try again.')
+      } else {
+        setIsAuth({ isLoggedIn: true, userID: USER.USER_ID })
+        setCurrUser(USER[0])
+        setUserType(`${USER[0].USER_TYPE}`)
+        navigate('/')
+        // await fetchUser(USER).then(navigate('/'))
+      }
+    }
 
-  return (
-    <div className="container-center-login">
-      <div className="container">
-        <div className="row">
-          <div className="col-md-4 offset-md-4 border rounded p-4 mt-2 shadow">
-            <img src={logoWords} alt="BackItUp" style={{ maxHeight: 50 }} className="m-2 mb-4" />
-            <form onSubmit={(event) => onSubmit(event)}>
+    await logIn()
+    // const details = {
+    //   userEmail: email,
+    //   userPass: password
+    // }
 
-              <div className="mb-3">
+    // console.log(password, "password submitted is")
+
+    // const isVerified =
+    //   await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/verifyUser/${details.userEmail}/${details.userPass}`).then()
+    // console.log(isVerified.data, "API result");
+
+    // setIsAuth({ isLoggedIn: true, userID: isVerified.data })
+    // const currResponse = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/user/${isVerified.data}`).then()
+    // const curr = currResponse.data
+    // setCurrUser(curr)
+    // setUserType(`${curr.userType}`)
+    // console.log(curr.userType, "set user type to");
+    // navigate("/")
+    // console.log("login SUCCESS");
+
+  } catch (error) {
+    console.error(error);
+    console.log("diu")
+    window.alert('You have input an incorrect email/password. Please refresh and resubmit the form.')
+  }
+
+};
+
+return (
+  <div className="container-center-login">
+    <div className="container">
+      <div className="row">
+        <div className="col-md-4 offset-md-4 border rounded p-4 mt-2 shadow">
+          <img src={logoWords} alt="BackItUp" style={{ maxHeight: 50 }} className="m-2 mb-4" />
+          <form onSubmit={(event) => onSubmit(event)}>
+
+            <div className="mb-3">
+              <input
+                required type={"text"}
+                className="form-control"
+                placeholder="Email address"
+                name="email"
+                value={email}
+                onChange={(event) => handleChange(event)}
+              />
+            </div>
+
+            <div className="mb-3">
+              <div className="password-input-wrapper">
                 <input
-                  required type={"text"}
-                  className="form-control"
-                  placeholder="Email address"
-                  name="email"
-                  value={email}
+                  required type={showPassword ? 'text' : 'password'}
+                  className={showPassword ? "form-control" : "form-control password-input"}
+                  placeholder="Password"
+                  name="password"
+                  value={password}
                   onChange={(event) => handleChange(event)}
                 />
+                <button type="button" className="btn password-toggle" onClick={handleTogglePassword}>
+                  <img src={showPassword ? pwHide : pwShow} style={{ height: 30 }} />
+                </button>
+
               </div>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-solid-dark mb-3"
+              disabled={!(email !== undefined && password !== undefined)} >Submit</button>
+            <hr />
+            <div id="signInDiv" className='btn btn-block mb-2'></div>
+            <div>
+              <small
+                id="loginHelp"
+                className="form-text text-muted">Don't have an account?
+                <a href="/adduser">Sign up today.</a></small>
+            </div>
 
-              <div className="mb-3">
-                <div className="password-input-wrapper">
-                  <input
-                    required type={showPassword ? 'text' : 'password'}
-                    className={showPassword ? "form-control" : "form-control password-input"}
-                    placeholder="Password"
-                    name="password"
-                    value={password}
-                    onChange={(event) => handleChange(event)}
-                  />
-                  <button type="button" className="btn password-toggle" onClick={handleTogglePassword}>
-                    <img src={showPassword ? pwHide : pwShow} style={{ height: 30 }} />
-                  </button>
-
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="btn btn-solid-dark mb-3"
-                disabled={!(email !== undefined && password !== undefined)} >Submit</button>
-              <hr />
-              <div id="signInDiv" className='btn btn-block mb-2'></div>
-              <div>
-                <small
-                  id="loginHelp"
-                  className="form-text text-muted">Don't have an account?
-                  <a href="/adduser">Sign up today.</a></small>
-              </div>
-
-            </form>
-          </div>
-
+          </form>
         </div>
+
       </div>
     </div>
-  )
+  </div>
+)
 }

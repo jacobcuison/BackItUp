@@ -38,6 +38,8 @@ export default function CreatePost({ currUser, setPageTitle }) {
   const [checked, setChecked] = useState(false)
   const [value, setValue] = useState("0")
 
+  const [shareId, setShareId] = useState(null)
+
   useEffect(() => {
     setPageTitle("Create Post • BackItUp")
   }, [])
@@ -63,29 +65,8 @@ export default function CreatePost({ currUser, setPageTitle }) {
       const date = new Date();
       const formattedDate = date.toISOString().substr(0, 19);
 
-      let shareId = -1;
-
-      async function insertShare() {
-        const { data, error } = await supabase
-          .from('SHARE')
-          .insert([
-            {
-              SHARE_COUNT_TOTAL: parseInt(SHARE_COUNT_TOTAL),
-              SHARE_COUNT_MIN: parseInt(SHARE_COUNT_MIN),
-              SHARE_COUNT_CURRENT: 0,
-              SHARE_COUNT_PRICE: parseFloat(SHARE_COUNT_PRICE),
-            },
-          ])
-          .select('SHARE_ID')
-
-        if (error) {
-          console.log('Error inserting share: ', error);
-        } else {
-          shareId = data
-        }
-      }
-
       async function insertData() {
+        console.log('SHAREID FROM INSERTDATA IS: ', shareId);
         const { data, error } = await supabase
           .from('POST')
           .insert([
@@ -99,54 +80,84 @@ export default function CreatePost({ currUser, setPageTitle }) {
               POST_CREATE_DT: formattedDate, // Replace with an appropriate date and time
               POST_EXPIRE_DT: postEndDate.toISOString().substr(0, 19), // Replace with an appropriate date and time
               POST_RAISE_DT: postRaiseDate.toISOString().substr(0, 19), // Replace with an appropriate date and time
-              SHARE_ID: shareId,
+              SHARE_ID: shareId.SHARE_ID,
               USER_ID: currUser.USER_ID,
-            },
+              POST_PHOTOURL: photoURL
+            }
           ])
           .select()
 
         if (error) {
-          console.log('Error inserting share: ', error);
+          console.log('Error inserting post data: ', error);
+          // throw new Error()
         } else {
-          //
+          console.log('it is successful post creation time #swag');
+          navigate("/createcompany/thanks")
         }
       }
 
-      async function insertPhoto() {
-
-        async function countPosts() {
-          let { data: POST, error } = await supabase
-            .from('POST')
-            .select('*')
-          // .eq('POST_STATUS', status)
-
-          if (error) {
-            console.error('Error fetching data:', error);
-          } else {
-            return POST.length
-            console.log(POST);
-          }
-        }
-
-        let count = await countPosts()
-
-        let { data, error } = await supabase
-          .from('POST')
-          .update({ POST_PHOTOURL: photoURL })
-          .eq('POST_ID', count)
+      async function insertShare() {
+        const { data, error } = await supabase
+          .from('SHARE')
+          .insert([
+            {
+              SHARE_COUNT_TOTAL: parseInt(SHARE_COUNT_TOTAL),
+              SHARE_COUNT_MIN: parseInt(SHARE_COUNT_MIN),
+              SHARE_COUNT_CURRENT: 0,
+              SHARE_COUNT_PRICE: parseFloat(SHARE_COUNT_PRICE),
+              USER_ID: currUser.USER_ID
+            },
+          ])
+          .select('SHARE_ID')
 
         if (error) {
-          console.error('Error fetching data:', error);
+          console.log('Error inserting share: ', error);
+          // throw new Error()
         } else {
-          // setInvsPost(POST);
-          // console.log(POST);
+          console.log(data[0]);
+          console.log('setting share to: ', data[0].SHARE_ID);
+          setShareId(data[0])
+          // await insertData()
+            // .then(async () => await insertData())
         }
       }
 
-      await insertData()
-        .then(await insertShare())
-        .then(await insertPhoto())
-        .then(navigate("/"))
+      
+
+      // async function insertPhoto() {
+
+      //   async function countPosts() {
+      //     let { data: POST, error } = await supabase
+      //       .from('POST')
+      //       .select('*')
+      //     // .eq('POST_STATUS', status)
+
+      //     if (error) {
+      //       console.error('Error fetching data:', error);
+      //     } else {
+      //       return POST.length
+      //       console.log(POST);
+      //     }
+      //   }
+
+      //   let count = await countPosts()
+
+      //   let { data, error } = await supabase
+      //     .from('POST')
+      //     .update({ POST_PHOTOURL: photoURL })
+      //     .eq('POST_ID', count)
+
+      //   if (error) {
+      //     console.error('Error fetching data:', error);
+      //   } else {
+      //     // setInvsPost(POST);
+      //     // console.log(POST);
+      //   }
+      // }
+
+      await insertShare()
+        .then(await insertData())
+        // .then(navigate("/createcompany/thanks"))
 
       // const pdata = {
       //   postTitle: post_TITLE,
@@ -196,9 +207,6 @@ export default function CreatePost({ currUser, setPageTitle }) {
       console.error(error);
       console.log("post creation failure")
     }
-
-
-    navigate("/")
   };
 
   return (
@@ -235,7 +243,7 @@ export default function CreatePost({ currUser, setPageTitle }) {
               <input
                 class="form-control"
                 type="text"
-                placeholder={`${currUser.userName}`}
+                placeholder={`${currUser.USER_NAME}`}
                 aria-label="Disabled input example"
                 disabled></input>
             </div>
@@ -402,7 +410,7 @@ export default function CreatePost({ currUser, setPageTitle }) {
                 <label
                   htmlFor="Pitch"
                   className="form-label">
-                  Link to Pitch Deck
+                  Cover Photo
                 </label>
                 <input
                   required type={"text"}

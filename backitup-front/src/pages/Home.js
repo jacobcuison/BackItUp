@@ -34,7 +34,9 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
       let { data: POST, error } = await supabase
         .from('POST')
         .select('*')
-        // .eq('POST_STATUS', status)
+        .eq('POST_STATUS', 1)
+        // .eq('POST_STATUS', 2)
+        // .eq('POST_STATUS', 3)
 
       if (error) {
         console.error('Error fetching data:', error);
@@ -106,7 +108,7 @@ export default function Home({ setPageTitle, setUserType, isAuth }) {
 
                     <img
                       className="card-img-top"
-                      src={post.postPhotoURL == null ? "/images/post/post-default.png" : post.POST_PHOTOURL}
+                      src={post.POST_PHOTOURL == null ? "/images/post/post-default.png" : post.POST_PHOTOURL}
                       alt="Card image cap"
                     />
 

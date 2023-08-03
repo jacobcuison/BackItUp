@@ -38,9 +38,9 @@ export default function Profile({ currUser, setPageTitle, userType }) {
   }
 
   useEffect(() => {
-    setPageTitle(`${currUser.userName}'s Profile • BackItUp`)
+    setPageTitle(`${currUser.USER_NAME}'s Profile • BackItUp`)
     console.log("curr user type", userType);
-    console.log("picture showing: ", currUser.userPhotoURL);
+    console.log("picture showing: ", currUser.USER_PHOTOURL);
   }, []);
 
   return (
