@@ -59,10 +59,9 @@ export default function PaymentsList() {
               <th scope="col">ID</th>
               <th scope="col">Date</th>
               <th scope="col">Amount</th>
-              <th scope="col">Payer</th>{/* change to 'Company'? */}
-              <th scope="col">Payee</th>{/* see google sheet for db architecture, cell e37 */}
+              <th scope="col">Investor</th>{/* change to 'Company'? */}
+              <th scope="col">Company</th>{/* see google sheet for db architecture, cell e37 */}
               <th scope="col">Verified</th>
-              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -73,8 +72,8 @@ export default function PaymentsList() {
                   <td>{pmt.PAYMENT_ID}</td>
                   <td>{pmt.PAYMENT_DT}</td>
                   <td>{pmt.PAYMENT_AMOUNT}</td>
-                  <td>{pmt.WALLET_FROM.WALLET_ID}</td>
-                  <td>{pmt.WALLET_TO.WALLET_ID}</td>
+                  <td>{pmt.WALLET_ID_FROM}</td>
+                  <td>{pmt.WALLET_ID_TO}</td>
                   <td>
                     {
                       pmt.USER_VERIFIED ? 'Y' : 'N'

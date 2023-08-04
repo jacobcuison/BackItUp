@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import InvestmentRowTitle from './InvestmentRowTitle'
 import InvestmentRowView from './InvestmentRowView'
+import InvestmentRowCompany from './InvestmentRowCompany'
 import { createClient } from '@supabase/supabase-js'
 
 export default function InvestmentUser({ currUser }) {
@@ -20,7 +21,7 @@ export default function InvestmentUser({ currUser }) {
 
     async function fetchData() {
       let { data: USER, error } = await supabase
-        .from('INVEST')
+        .from('INVESTMENT')
         .select('*')
         .eq('USER_ID', currUser.USER_ID)
         // .eq('POST_STATUS', status)
@@ -57,7 +58,7 @@ export default function InvestmentUser({ currUser }) {
                   {/* <th scope="col">Project</th> */}
                   <th scope="col">Project</th>
                   <th scope="col">Company</th>
-                  <th scope="col">Value</th>
+                  <th scope="col"># of Shares</th>
                   <th scope="col">Action</th>
                 </tr>
               </thead>
@@ -71,8 +72,10 @@ export default function InvestmentUser({ currUser }) {
                       <td style={{ textAlign: "center" }}>
                         <InvestmentRowTitle inv={inv} />
                       </td>
-                      <td>{inv.share.user.userName}</td>
-                      <td>{inv.shareAmount * inv.share.shareCountPrice}</td>
+                      <td style={{ textAlign: "center" }}>
+                        <InvestmentRowCompany inv={inv} />
+                      </td>
+                      <td>{inv.SHARE_AMOUNT}</td>
                       <td>
                         <InvestmentRowView inv={inv} />
                       </td>

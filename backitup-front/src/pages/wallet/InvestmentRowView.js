@@ -25,7 +25,7 @@ export default function InvestmentRowTitle({ inv }) {
         if (error) {
           console.error('Error fetching data:', error);
         } else {
-          setInvsPost(POST);
+          setInvsPost(POST[0]);
           // console.log(POST);
         }
       }
