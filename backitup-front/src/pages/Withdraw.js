@@ -34,6 +34,31 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
       const date = new Date();
       const formattedDate = date.toISOString().substr(0, 19);
 
+      async function getWallet(WALLET_ID) {
+        const { data: WALLET, error } = await supabase
+          .from('WALLET')
+          .select()
+          .eq('WALLET_ID', WALLET_ID)
+  
+        if (error) {
+          console.log('Cannot get wallet :', error);
+        } else {
+          return WALLET[0]
+        }
+      }
+
+      const userWallet = await getWallet(currUser.WALLET_ID)
+
+      if (parseFloat(withdrawalAmount) < 0) {
+        alert('Please enter a positive number.')
+        throw new Error()
+      }
+
+      if (parseFloat(withdrawalAmount) > userWallet.ACTIVE_BALANCE) {
+        alert('Please ensure you have sufficient balance.')
+        throw new Error()
+      }
+
       async function withdraw() {
         const { data, error } = await supabase
           .from('WITHDRAWAL')
@@ -50,8 +75,8 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
 
         if (error) {
 
-          alert("Please enter a valid amount.")
-          console.log("withdrawal failure")
+          // alert("Please enter a valid amount.")
+          console.log("withdrawal failure", error)
         } else {
         }
 
@@ -59,20 +84,7 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
 
       await withdraw()
 
-      async function getWallet(WALLET_ID) {
-        const { data: WALLET, error } = await supabase
-          .from('WALLET')
-          .select()
-          .eq('WALLET_ID', WALLET_ID)
-  
-        if (error) {
-          console.log('Cannot get wallet :', error);
-        } else {
-          return WALLET[0]
-        }
-      }
-
-      const userWallet = await getWallet(currUser.WALLET_ID)
+      
 
       async function changeWallet(WALLET, change) {
         const { data, error } = await supabase
@@ -111,7 +123,7 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
       // console.log("withdrawal success");
       navigate("/withdraw/thanks")
     } catch (error) {
-      alert("Please enter a valid amount.")
+      // alert("Please enter a valid amount.")
       console.log("withdrawal failure")
     }
 
@@ -135,6 +147,7 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
                     <div class="input-group">
                       <span class="input-group-text">$</span>
                       <input
+                        required
                         type={"text"}
                         className="form-control"
                         placeholder="Enter a number..."
@@ -148,6 +161,7 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
                       PayNow Number
                     </label>
                     <input
+                      required
                       type={"text"}
                       className="form-control"
                       placeholder="Enter a number..."
