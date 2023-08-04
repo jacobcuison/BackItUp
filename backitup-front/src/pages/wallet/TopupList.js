@@ -29,13 +29,14 @@ export default function TopupList({ wallet }) {
         console.error('Error fetching data:', error);
       } else {
         console.log('data received is ', USER);
-        setTopups(USER[0]);
+        setTopups(USER);
         // console.log(POST);
       }
     }
 
     await fetchData()
     setLoading(false)
+    console.log('topups are ', topups);
 
     // console.log("my wallet", wallet);
     // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/listTopUp/${wallet.wallet_ID}`)

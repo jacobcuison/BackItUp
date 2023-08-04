@@ -27,7 +27,7 @@ export default function WithdrawalListUser({wallet}) {
         if (error) {
           console.error('Error fetching data:', error);
         } else {
-          setWds(USER[0]);
+          setWds(USER);
         }
       }
   

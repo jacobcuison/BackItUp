@@ -53,12 +53,42 @@ export default function Withdraw({ currUser, isAuth, setPageTitle }) {
           alert("Please enter a valid amount.")
           console.log("withdrawal failure")
         } else {
-          navigate("/withdraw/thanks")
         }
 
       }
 
       await withdraw()
+
+      async function getWallet(WALLET_ID) {
+        const { data: WALLET, error } = await supabase
+          .from('WALLET')
+          .select()
+          .eq('WALLET_ID', WALLET_ID)
+  
+        if (error) {
+          console.log('Cannot get wallet :', error);
+        } else {
+          return WALLET[0]
+        }
+      }
+
+      const userWallet = await getWallet(currUser.WALLET_ID)
+
+      async function changeWallet(WALLET, change) {
+        const { data, error } = await supabase
+          .from('WALLET')
+          .update({ 'ACTIVE_BALANCE': WALLET.ACTIVE_BALANCE + change })
+          .eq('WALLET_ID', WALLET.WALLET_ID)
+          .select()
+  
+        if (error) {
+          console.log('Error changing wallet', error);
+        } else {
+          navigate("/withdraw/thanks")
+        }
+      }
+
+      await changeWallet(userWallet, parseFloat(withdrawalAmount))
       // const data = {
       //   walletID: currUser.wallet.wallet_ID,
       //   withdrawalAmount: parseFloat(withdrawalAmount),

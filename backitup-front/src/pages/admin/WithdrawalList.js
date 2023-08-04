@@ -38,52 +38,121 @@ export default function WithdrawalList() {
     // console.log(result.data);
   }
 
-  const clickVerify = async (WITHDRAWAL_ID) => {
+  const clickVerify = async (WD) => {
     const date = new Date();
     const dt = date.toISOString().substr(0, 19);
     
-    async function fetchData() {
-      const { data, error } = await supabase
-        .from('WITHDRAWAL')
-        .update({ WITHDRAWAL_VERIFIED : 1 })
-        .eq('WITHDRAWAL_ID', WITHDRAWAL_ID)
+    async function getWallet(WALLET_ID) {
+      const { data: WALLET, error } = await supabase
+        .from('WALLET')
         .select()
+        .eq('WALLET_ID', WALLET_ID)
 
       if (error) {
-        console.error('Error fetching data:', error);
+        console.log('Cannot get wallet :', error);
       } else {
-        // setPosts(POST);
-        // console.log(POST);
-        alert("Successfully verified! Please refresh the page.")
+        return WALLET[0]
       }
     }
 
-    await fetchData()
+    const currWallet = await getWallet(WD.WALLET_ID)
+
+    async function changeWallet(WALLET, change) {
+      const { data, error } = await supabase
+        .from('WALLET')
+        .update({ 'ACTIVE_BALANCE': WALLET.ACTIVE_BALANCE - change })
+        .eq('WALLET_ID', WALLET.WALLET_ID)
+        .select()
+
+      if (error) {
+        console.log('Error changing wallet', error);
+      } else {
+
+      }
+    }
+
+    await changeWallet(currWallet, WD.WITHDRAWAL_AMOUNT)
+
+    async function fetchData() {
+    let { data, error } = await supabase
+      .from('WITHDRAWAL')
+      .update({
+        WITHDRAWAL_VERIFIED: 1,
+        WITHDRAWAL_DONE_DT: dt
+      })
+      .eq('WITHDRAWAL_ID', WD.WITHDRAWAL_ID)
+      .select()
+
+    if (error) {
+      console.error('Error fetching data:', error);
+    } else {
+      // setPosts(POST);
+      // console.log(POST);
+      alert("Successfully verified! Please refresh the page.")
+    }
+  }
+
+  await fetchData();
     
     // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/withdrawal/verify/${withdrawalID}/${dt}`)
     // alert("Successfully verified! Please refresh the page.")
   }
 
-  const clickUnverify = async (WITHDRAWAL_ID) => {
+  const clickUnverify = async (WD) => {
     const date = new Date();
     const dt = date.toISOString().substr(0, 19);
     
-    async function fetchData() {
-      const { data, error } = await supabase
-        .from('WITHDRAWAL')
-        .update({ WITHDRAWAL_VERIFIED : -1 })
-        .eq('WITHDRAWAL_ID', WITHDRAWAL_ID)
-        
+    async function getWallet(WALLET_ID) {
+      const { data: WALLET, error } = await supabase
+        .from('WALLET')
+        .select()
+        .eq('WALLET_ID', WALLET_ID)
+
       if (error) {
-        console.error('Error fetching data:', error);
+        console.log('Cannot get wallet :', error);
       } else {
-        // setPosts(POST);
-        // console.log(POST);
-        alert("Successfully unverified! Please refresh the page.")
+        return WALLET[0]
       }
     }
 
-    await fetchData()
+    const currWallet = await getWallet(WD.WALLET_ID)
+
+    async function changeWallet(WALLET, change) {
+      const { data, error } = await supabase
+        .from('WALLET')
+        .update({ 'ACTIVE_BALANCE': WALLET.ACTIVE_BALANCE + change })
+        .eq('WALLET_ID', WALLET.WALLET_ID)
+        .select()
+
+      if (error) {
+        console.log('Error changing wallet', error);
+      } else {
+
+      }
+    }
+
+    await changeWallet(currWallet, WD.WITHDRAWAL_AMOUNT)
+
+    async function fetchData() {
+    let { data, error } = await supabase
+      .from('WITHDRAWAL')
+      .update({
+        WITHDRAWAL_VERIFIED: -1,
+        WITHDRAWAL_DONE_DT: dt
+      })
+      .eq('WITHDRAWAL_ID', WD.WITHDRAWAL_ID)
+      .select()
+
+    if (error) {
+      console.error('Error fetching data:', error);
+    } else {
+      // setPosts(POST);
+      // console.log(POST);
+      alert("Successfully verified! Please refresh the page.")
+    }
+  }
+
+  await fetchData();
     
     // axios.get(`https://orbital-1690146023037.azurewebsites.net/api/withdrawal/unverify/${withdrawalID}/${dt}`)
     // alert("Successfully unverified! Please refresh the page.")
@@ -114,9 +183,9 @@ export default function WithdrawalList() {
                   <td>{wd.WITHDRAWAL_ID}</td>
                   <td>{wd.WITHDRAWAL_AMOUNT}</td>
                   <td>
-                    {wd.PENDING_STATUS == true
-                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(wd.WITHDRAWAL_ID)}>Verify</button>
-                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(wd.WITHDRAWAL_ID)}>Unverify</button>
+                    {wd.WITHDRAWAL_VERIFIED !== 1
+                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(wd)}>Verify</button>
+                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(wd)}>Unverify</button>
                     }
                   </td>
                   <td>{wd.WITHDRAWAL_DONE_DT}</td>

@@ -47,16 +47,17 @@ export default function Topup({ currUser, isAuth, setPageTitle }) {
               TOPUP_DT: formattedDate,
               TOPUP_VERIFIED: 0,
               TOPUP_EVIDENCE: topupEvidence,
-              WALLET_ID: currUser.wallet.WALLET_ID,
+              WALLET_ID: currUser.WALLET_ID,
             },
           ])
           .select()
 
-        if (topupAmount <= 0) {
+        if (parseFloat(topupAmount) <= 0) {
           throw new Error()
         }
 
         if (error) {
+          console.log('Error with topup: ', error);
           alert("Please ensure you entered valid positive numbers.")
         } else {
           navigate("/topup/thanks")
@@ -66,6 +67,37 @@ export default function Topup({ currUser, isAuth, setPageTitle }) {
       }
 
       await topup()
+
+      async function getWallet(WALLET_ID) {
+        const { data: WALLET, error } = await supabase
+          .from('WALLET')
+          .select()
+          .eq('WALLET_ID', WALLET_ID)
+  
+        if (error) {
+          console.log('Cannot get wallet :', error);
+        } else {
+          return WALLET[0]
+        }
+      }
+
+      const userWallet = await getWallet(currUser.WALLET_ID)
+
+      async function changeWallet(WALLET, change) {
+        const { data, error } = await supabase
+          .from('WALLET')
+          .update({ 'ACTIVE_BALANCE': WALLET.ACTIVE_BALANCE + change })
+          .eq('WALLET_ID', WALLET.WALLET_ID)
+          .select()
+  
+        if (error) {
+          console.log('Error changing wallet', error);
+        } else {
+          
+        }
+      }
+
+      await changeWallet(userWallet, parseFloat(topupAmount))
       // const data = {
       //   walletID: currUser.wallet.wallet_ID,
       //   topupAmount: parseFloat(topupAmount),
@@ -91,6 +123,8 @@ export default function Topup({ currUser, isAuth, setPageTitle }) {
 
       // navigate("/topup/thanks")
     } catch (error) {
+      
+      console.log('Error with topup: ', error);
       console.log("topup error")
       alert("Please ensure you entered valid positive numbers.")
     }

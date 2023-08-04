@@ -31,28 +31,61 @@ export default function TopupList() {
     }
 
     await fetchData();
-    
-    
+
+
     // const result = await axios.get("https://orbital-1690146023037.azurewebsites.net/api/listTopup")
     console.log(users);
     // setUsers(result.data)
     // console.log(result.data);
   }
 
-  const clickVerify = async (TOPUP_ID) => {
-    
+  const clickVerify = async (TOPUP) => {
+
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
 
-    async function fetchData() {
 
+      async function getWallet(WALLET_ID) {
+        const { data: WALLET, error } = await supabase
+          .from('WALLET')
+          .select()
+          .eq('WALLET_ID', WALLET_ID)
+
+        if (error) {
+          console.log('Cannot get wallet :', error);
+        } else {
+          return WALLET[0]
+        }
+      }
+
+      const currWallet = await getWallet(TOPUP.WALLET_ID)
+
+      async function changeWallet(WALLET, change) {
+        const { data, error } = await supabase
+          .from('WALLET')
+          .update({ 'ACTIVE_BALANCE': WALLET.ACTIVE_BALANCE + change })
+          .eq('WALLET_ID', WALLET.WALLET_ID)
+          .select()
+
+        if (error) {
+          console.log('Error changing wallet', error);
+        } else {
+
+        }
+      }
+
+      await changeWallet(currWallet, TOPUP.TOPUP_AMOUNT)
+
+      async function fetchData() {
       let { data, error } = await supabase
         .from('TOPUP')
-        .update({ TOPUP_VERIFIED : 1 })
-        .update({ TOPUP_APPROVED_DT: formattedDate })
-        .eq('TOPUP_ID', TOPUP_ID)
+        .update({
+          TOPUP_VERIFIED: 1,
+          TOPUP_DONE_DT: formattedDate
+        })
+        .eq('TOPUP_ID', TOPUP.TOPUP_ID)
         .select()
-    
+
       if (error) {
         console.error('Error fetching data:', error);
       } else {
@@ -68,29 +101,63 @@ export default function TopupList() {
     // alert("Successfully verified! Please refresh the page.")
   }
 
-  const clickUnverify = async (TOPUP_ID) => {
-    
+  const clickUnverify = async (TOPUP) => {
+
     const date = new Date();
     const formattedDate = date.toISOString().substr(0, 19);
 
-    async function fetchData() {
-      let { data, error } = await supabase
-        .from('TOPUP')
-        .update({ TOPUP_VERIFIED : -1 })
-        .update({ TOPUP_APPROVED_DT: formattedDate })
-        .eq('TOPUP_ID', TOPUP_ID)
+    async function getWallet(WALLET_ID) {
+      const { data: WALLET, error } = await supabase
+        .from('WALLET')
         .select()
-    
+        .eq('WALLET_ID', WALLET_ID)
+
       if (error) {
-        console.error('Error fetching data:', error);
+        console.log('Cannot get wallet :', error);
       } else {
-        // setPosts(POST);
-        // console.log(POST);
-        alert("Successfully unverified! Please refresh the page.")
+        return WALLET[0]
       }
     }
 
-    await fetchData();
+    const currWallet = await getWallet(TOPUP.WALLET_ID)
+
+    async function changeWallet(WALLET, change) {
+      const { data, error } = await supabase
+        .from('WALLET')
+        .update({ 'ACTIVE_BALANCE': WALLET.ACTIVE_BALANCE - change })
+        .eq('WALLET_ID', WALLET.WALLET_ID)
+        .select()
+
+      if (error) {
+        console.log('Error changing wallet', error);
+      } else {
+
+      }
+    }
+
+    await changeWallet(currWallet, TOPUP.TOPUP_AMOUNT)
+
+    async function fetchData() {
+    let { data, error } = await supabase
+      .from('TOPUP')
+      .update({
+        TOPUP_VERIFIED: -1,
+        TOPUP_DONE_DT: formattedDate
+      })
+      .eq('TOPUP_ID', TOPUP.TOPUP_ID)
+      .select()
+
+    if (error) {
+      console.error('Error fetching data:', error);
+    } else {
+      // setPosts(POST);
+      // console.log(POST);
+      alert("Successfully verified! Please refresh the page.")
+    }
+  }
+
+  await fetchData();
+
 
     // axios.get(`https://orbital-1690146023037.azurewebsites.net/${userID}/unverify`)
     // alert("Successfully unverified! Please refresh the page.")
@@ -121,9 +188,9 @@ export default function TopupList() {
                   <td>{user.TOPUP_ID}</td>
                   <td>{user.TOPUP_AMOUNT}</td>
                   <td>
-                    {user.PENDING_STATUS
-                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(user.TOPUP_ID)}>Verify</button>
-                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(user.TOPUP_ID)}>Unverify</button>
+                    {user.TOPUP_VERIFIED !== 1
+                      ? <button className='btn btn-outline-success max-2' onClick={() => clickVerify(user)}>Verify</button>
+                      : <button className='btn btn-outline-danger max-2' onClick={() => clickUnverify(user)}>Unverify</button>
                     }
                   </td>
                   <td>{user.TOPUP_DONE_DT}</td>
