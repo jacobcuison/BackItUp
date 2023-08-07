@@ -1,15 +1,22 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "../styles/styles.css"
 import logo from "../images/logo-words.png"
 import bell from "../images/bell.png"
 import NotificationDrawer from "./NotificationDrawer";
 import { Container, Dropdown, DropdownButton } from 'react-bootstrap';
 
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faComment } from '@fortawesome/free-solid-svg-icons'
+
 import { Button } from 'react-bootstrap';
 
 export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
+
+  
+  let navigate = useNavigate()
 
   // const [isCompany, setIsCompany] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
@@ -105,6 +112,11 @@ export default function Navbar({ isAuth, setIsAuth, currUser, userType }) {
 
             {isAuth.isLoggedIn
               ? <div className="d-flex">
+                <Link
+                  className='btn btn-link'
+                  to={'/chat'}>
+                    <FontAwesomeIcon icon={faComment} style={{color: "#ffffff"}} size="2x" />
+                </Link>
                 <button
                   className='btn btn-link'
                   onClick={handleNotifToggle}>

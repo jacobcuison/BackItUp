@@ -32,6 +32,7 @@ import { gapi } from 'gapi-script'
 import AdminPassword from './pages/admin/AdminPassword'
 import Resources from './pages/get-started/Resources';
 import { createClient } from '@supabase/supabase-js'
+import Chat from './pages/messaging/Chat';
 
 function App() {
 
@@ -72,6 +73,7 @@ function App() {
           <Route path="/profile/:id" element={<Profile currUser={currUser} setPageTitle={setPageTitle} userType={userType} />} />
           {/* <Route path ="/profile" element={<Profile currUser={currUser} setPageTitle={setPageTitle} />} /> */}
           <Route path="/profile/:id/edit" element={<EditUser currUser={currUser} />} />
+          <Route path="/chat" element={<Chat currUser={currUser} setPageTitle={setPageTitle}/>} />
 
           <Route path="/getstarted/invest" element={<HowToInvest setPageTitle={setPageTitle} setUserType={setUserType} />} />
           <Route path="/getstarted/raise" element={<HowToRaise setPageTitle={setPageTitle} setUserType={setUserType} />} />

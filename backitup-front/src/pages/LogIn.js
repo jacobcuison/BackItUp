@@ -57,11 +57,9 @@ export default function LogIn({ setCurrUser, setIsAuth, setPageTitle, setUserTyp
           alert('You do not have a BackItUp account linked to this Google account.')
         
         } else {
-          console.log(USER);
+          console.log(USER, 'login');
           return USER[0]
         }
-
-        
       }
 
       const idAuth = await logInAuth()
@@ -118,36 +116,40 @@ useEffect(() => {
   )
 }, [])
 
-// Post user registration info to database
+// Query user login info from database
 const onSubmit = async (event) => {
   event.preventDefault()
   try {
-    async function fetchUser(USER_ID) {
-      let { data: USER, error } = await supabase
-        .from('USER')
-        .select('*')
-        .eq('USER_ID', USER_ID)
+    // async function fetchUser(USER_ID) {
+    //   let { data: USER, error } = await supabase
+    //     .from('USER')
+    //     .select('*')
+    //     .eq('USER_ID', USER_ID)
 
-      if (error) {
-        console.error('Error fetching data:', error);
-      } else {
-        setCurrUser(USER[0])
-        setUserType(`${USER[0].USER_TYPE}`)
-        console.log(USER, "result of fetchUser API call");
-      }
-    }
+    //   if (error) {
+    //     console.error('Error fetching data:', error);
+    //   } else {
+    //     setCurrUser(USER[0])
+    //     setUserType(`${USER[0].USER_TYPE}`)
+    //     console.log(USER, "result of fetchUser API call");
+    //   }
+    // }
 
-    await fetchUser()
+    // await fetchUser()
+
     async function logIn() {
       let { data: USER, error } = await supabase
         .from('USER')
         .select('*')
         .eq('USER_EMAIL', email)
         .eq('USER_PASS', password)
+
       if (error) {
         alert('You have input an incorrect email/password. Please refresh and try again.')
       } else {
-        setIsAuth({ isLoggedIn: true, userID: USER.USER_ID })
+        console.log('DATA received', USER);
+        console.log('currUser', USER[0]);
+        setIsAuth({ isLoggedIn: true, userID: USER[0].USER_ID })
         setCurrUser(USER[0])
         setUserType(`${USER[0].USER_TYPE}`)
         navigate('/')

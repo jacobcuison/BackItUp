@@ -6,6 +6,7 @@ import Loader from '../components/Loader.jsx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faMobile, faGlobe } from '@fortawesome/free-solid-svg-icons'
 import { createClient } from '@supabase/supabase-js'
+import ChatModal from './messaging/ChatModal'
 
 export default function Post({ currUser, isAuth, setPageTitle, userType }) {
 
@@ -17,6 +18,18 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
   const [creator, setCreator] = useState([])
   const [share, setShare] = useState(null)
   const { id } = useParams()
+
+  // Chat
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalOpen = () => {
+    console.log('modal is become true');
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     loadPost()
@@ -55,7 +68,7 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
       const result = await fetchPost().then()
       setPost(result)
 
-      
+
       // AXIOS CODE
       // const result = await axios.get(`https://orbital-1690146023037.azurewebsites.net/api/post/${id}`) // change the link as necessary
       // setPost(result.data);
@@ -148,31 +161,38 @@ export default function Post({ currUser, isAuth, setPageTitle, userType }) {
                 <p><strong>MINIMUM SHARE PURCHASE</strong></p>
                 <h3>{post.SHARE.SHARE_COUNT_MIN}</h3>
               </div>
-
-              <Link
-                className={`btn btn-solid-dark btn-lg px-4 me-md-2 fw-bold mt-5 d-flex justify-content-center 
+              <div className='d-grid'>
+                <Link
+                  className={`btn btn-solid-dark btn-lg px-4 me-md-2 fw-bold mt-5 d-flex justify-content-center 
                 ${currUser.USER_TYPE === 'Investor' ? "" : "disabled"}`}
-                to={isAuth.isLoggedIn ? `/invest/${id}` : `/oops`} >
-                Invest
-              </Link>
+                  to={isAuth.isLoggedIn ? `/invest/${id}` : `/oops`} >
+                  Invest
+                </Link>
+                <button
+                  className={`btn btn-outline-dark btn-lg px-4 me-md-2 fw-bold mt-2 justify-content-center 
+                ${currUser.USER_TYPE === 'Investor' ? "" : "disabled"}`} onClick={handleModalOpen}>Chat
+                  
+                </button>
+                <ChatModal isOpen={isModalOpen} onClose={handleModalClose} creator={creator} currUser={currUser} />
+              </div>
               <hr />
               <div style={{ textAlign: "left" }}>
                 {creator.USER_SHOWCONTACT
-                ? <div>
-                  <p><strong>CONTACT</strong></p>
+                  ? <div>
+                    <p><strong>CONTACT</strong></p>
 
-                  <a className="contact-icon" href={`mailto:${creator.USER_EMAIL}`}>
-                    <FontAwesomeIcon icon={faEnvelope} />
-                  </a>
-                  <a className="contact-icon" href={`tel:${creator.USER_HP}`}>
-                    <FontAwesomeIcon icon={faMobile} />
-                  </a>
-                  <a className="contact-icon" href={creator.USER_LINKEDINLINK} target='_blank'>
-                    <FontAwesomeIcon icon={faGlobe} />
-                  </a>
-                </div>
-                : <></>
-              }
+                    <a className="contact-icon" href={`mailto:${creator.USER_EMAIL}`}>
+                      <FontAwesomeIcon icon={faEnvelope} />
+                    </a>
+                    <a className="contact-icon" href={`tel:${creator.USER_HP}`}>
+                      <FontAwesomeIcon icon={faMobile} />
+                    </a>
+                    <a className="contact-icon" href={creator.USER_LINKEDINLINK} target='_blank'>
+                      <FontAwesomeIcon icon={faGlobe} />
+                    </a>
+                  </div>
+                  : <></>
+                }
               </div>
             </div>
           </div>
